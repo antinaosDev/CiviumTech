@@ -236,6 +236,7 @@ def generate_ticket_receipt_pdf(ticket_data):
         pdf.set_font('Arial', '', 10)
         pdf.set_text_color(0)
         # Fixed width layout: Label (50) + Value (140) = 190 (fits in 210 with 10mm margins)
+        val_str = str(value) if value is not None else "-"
         try:
             # Save x,y
             x = pdf.get_x()
