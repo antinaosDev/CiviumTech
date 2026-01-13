@@ -1,0 +1,216 @@
+/* Font Import */
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200');
+
+:root {
+    /* --- Premium Color Palette (CiviumTech Blue Adaptation) --- */
+    /* Primary: Blue for Trust & Technology */
+    --primary: #2563eb;
+    /* Blue 600 */
+    --primary-focus: #1d4ed8;
+    /* Blue 700 */
+    --primary-light: #eff6ff;
+    /* Blue 50 */
+    --primary-content: #ffffff;
+
+    /* Backgrounds */
+    --bg-main: #f8fafc;
+    /* Slate 50 */
+    --bg-card: #ffffff;
+    --bg-sidebar: #ffffff;
+
+    /* Text */
+    --text-primary: #1e293b;
+    /* Slate 800 */
+    --text-secondary: #64748b;
+    /* Slate 500 */
+    --text-muted: #94a3b8;
+    /* Slate 400 */
+
+    /* UI Borders & Depth */
+    --border-color: #e2e8f0;
+    /* Slate 200 */
+    --shadow-sm: 0 1px 3px 0 rgb(0 0 0 / 0.05), 0 1px 2px -1px rgb(0 0 0 / 0.05);
+    --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.07), 0 2px 4px -2px rgb(0 0 0 / 0.07);
+    --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.07), 0 4px 6px -4px rgb(0 0 0 / 0.07);
+
+    /* Typography */
+    --font-main: 'Manrope', sans-serif;
+}
+
+/* --- Global Reset --- */
+html,
+body,
+[class*="css"] {
+    font-family: var(--font-main) !important;
+    color: var(--text-primary);
+    -webkit-font-smoothing: antialiased;
+}
+
+.stApp {
+    background-color: var(--bg-main);
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    font-family: var(--font-main) !important;
+    font-weight: 800 !important;
+    color: var(--text-primary) !important;
+    letter-spacing: -0.025em;
+}
+
+/* --- Sidebar Override (CiviumTech Blue) --- */
+[data-testid="stSidebar"] {
+    background-color: #1e3a8a;
+    /* Blue 900 */
+    border-right: none;
+}
+
+[data-testid="stSidebar"] * {
+    color: #e0f2fe !important;
+    /* Light Blue text */
+}
+
+/* Fix Button Contrast in Sidebar - AGGRESSIVE */
+[data-testid="stSidebar"] .stButton button {
+    background-color: #ffffff !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    transition: all 0.2s ease-in-out !important;
+}
+
+/* Force ALL text inside sidebar buttons to be DARK BLUE */
+[data-testid="stSidebar"] .stButton button,
+[data-testid="stSidebar"] .stButton button p,
+[data-testid="stSidebar"] .stButton button div,
+[data-testid="stSidebar"] .stButton button span {
+    color: #0f172a !important;
+    /* Dark Slate 900 for max contrast */
+    font-weight: 700 !important;
+}
+
+[data-testid="stSidebar"] .stButton button:hover {
+    background-color: #eff6ff !important;
+    transform: translateX(2px);
+}
+
+[data-testid="stSidebar"] .stButton button:hover p,
+[data-testid="stSidebar"] .stButton button:hover span {
+    color: #2563eb !important;
+    /* Brighter blue on hover */
+}
+
+/* Fix Expander Header Contrast */
+[data-testid="stSidebar"] .streamlit-expanderHeader {
+    background-color: #f8fafc !important;
+    border-radius: 8px !important;
+    margin-bottom: 4px !important;
+}
+
+[data-testid="stSidebar"] .streamlit-expanderHeader p,
+[data-testid="stSidebar"] .streamlit-expanderHeader span,
+[data-testid="stSidebar"] .streamlit-expanderHeader div {
+    color: #0f172a !important;
+    /* Dark text */
+    font-weight: 600 !important;
+}
+
+[data-testid="stSidebar"] .streamlit-expanderHeader:hover {
+    background-color: #e2e8f0 !important;
+}
+
+/* Fix Inputs in Sidebar (Selectbox/Text) */
+[data-testid="stSidebar"] [data-baseweb="select"] div,
+[data-testid="stSidebar"] [data-baseweb="input"] input {
+    color: #0f172a !important;
+    background-color: #ffffff !important;
+}
+
+[data-testid="stSidebar"] div[data-baseweb="select"] span {
+    color: #0f172a !important;
+}
+
+/* Sidebar Nav Items */
+[data-testid="stSidebar"] [data-testid="stRadio"] label {
+    color: #cbd5e1 !important;
+}
+
+[data-testid="stSidebar"] [data-testid="stRadio"] label:hover {
+    background-color: rgba(255, 255, 255, 0.1) !important;
+    color: #ffffff !important;
+}
+
+[data-testid="stSidebar"] [data-testid="stRadio"] label:has(input:checked) {
+    background-color: #2563eb !important;
+    /* Blue 600 */
+    color: #ffffff !important;
+    font-weight: 700;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+/* Sidebar Separator */
+[data-testid="stSidebar"] hr {
+    border-color: rgba(255, 255, 255, 0.2) !important;
+}
+
+/* --- Login Specific Styles --- */
+.login-container {
+    display: flex;
+    height: 100vh;
+    width: 100vw;
+    overflow: hidden;
+}
+
+.login-left {
+    flex: 1;
+    background-image: url("https://images.unsplash.com/photo-1532104997193-87588e146dd9?ixlib=rb-4.0.3&auto=format&fit=crop&w=1500&q=80");
+    /* Green hills/nature */
+    background-size: cover;
+    background-position: center;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 4rem;
+}
+
+.login-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(30, 58, 138, 0.4) 0%, rgba(30, 58, 138, 0.9) 100%);
+    /* Blue gradient overlay */
+}
+
+.login-right {
+    flex: 0 0 500px;
+    background: white;
+    padding: 3rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    box-shadow: -10px 0 25px rgba(0, 0, 0, 0.05);
+}
+
+.login-tab-container {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    border-bottom: 2px solid #e2e8f0;
+}
+
+.login-tab {
+    padding-bottom: 0.5rem;
+    cursor: pointer;
+    font-weight: 600;
+    color: #64748b;
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s;
+}
+
+.login-tab.active {
+    color: var(--primary);
+    border-bottom-color: var(--primary);
+}

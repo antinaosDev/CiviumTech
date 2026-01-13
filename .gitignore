@@ -1,0 +1,24 @@
+
+# Streamlit secrets
+.streamlit/secrets.toml
+
+# Virtual environment
+venv/
+env/
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# OS Specific
+.DS_Store
+Thumbs.db
+
+# Environment variables
+.env
+
+# Temporary files from debugging
+found_data.txt
+find_bad_data.py

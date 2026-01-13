@@ -1,0 +1,9 @@
+streamlit
+supabase
+plotly
+pandas
+altair
+python-dotenv
+bcrypt
+geopy
+fpdf2
