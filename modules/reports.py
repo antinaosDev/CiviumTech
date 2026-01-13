@@ -237,6 +237,7 @@ def generate_ticket_receipt_pdf(ticket_data):
         pdf.set_text_color(0)
         # Use effective width explicit calculation to avoid FPDF rounding errors
         w = pdf.w - pdf.r_margin - pdf.x
+        if w < 10: w = 0 # Safety check for FPDF auto-width
         val_str = str(value) if value is not None else "-"
         pdf.multi_cell(w, 8, val_str)
         
