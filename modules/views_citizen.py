@@ -78,7 +78,7 @@ def render_citizen_view():
                 #         email_thread.start()
                 #         
                 #         st.success(f"✅ Se enviará el comprobante a **{ticket_data['user_email']}**.")
-                        st.session_state.receipt_sent = st.session_state.success_ticket_id
+                        # st.session_state.receipt_sent = st.session_state.success_ticket_id
                 
                 # PDF Download Button
                 if pdf_bytes:
