@@ -279,7 +279,7 @@ def generate_ticket_receipt_pdf(ticket_data):
     pdf.ln(20)
     pdf.set_font('Arial', 'I', 9)
     pdf.set_text_color(100)
-    pdf.multi_cell(0, 6, "Se ha enviado un respaldo de esta solicitud a su correo electrónico (si fue proporcionado).\n\nPuede consultar el estado de este requerimiento en el Portal Vecino utilizando su número de seguimiento.", 0, 'C')
+    pdf.multi_cell(0, 6, "Puede consultar el estado de este requerimiento en el Portal Vecino utilizando su número de seguimiento.", 0, 'C')
 
     try:
         tmp_file = tempfile.NamedTemporaryFile(delete=False, suffix=".pdf")
