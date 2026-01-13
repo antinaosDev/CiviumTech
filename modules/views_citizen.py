@@ -275,7 +275,7 @@ def render_citizen_view():
                          status_badge = render_status_badge(ticket.get('status', 'Pendiente'))
                          unit_label = UNIDADES.get(ticket.get('depto'), {}).get('label', ticket.get('depto'))
                          
-                        st.markdown(f"""
+                         st.markdown(f"""
 <div style="background: white; border: 1px solid #e2e8f0; border-radius: 12px; padding: 2rem;">
     <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem;">
         <div>
