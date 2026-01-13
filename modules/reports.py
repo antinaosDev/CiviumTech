@@ -220,7 +220,7 @@ def generate_ticket_receipt_pdf(ticket_data):
     
     pdf.set_font('Courier', 'B', 24)
     pdf.set_text_color(30, 41, 59) # Dark Slate
-    pdf.cell(0, 15, ticket_data.get('id', 'N/A'), 0, 1, 'C')
+    pdf.cell(0, 15, str(ticket_data.get('id', 'N/A'))[:8], 0, 1, 'C')
     pdf.ln(5)
     
     # Details Box

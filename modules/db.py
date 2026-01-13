@@ -131,18 +131,45 @@ def create_ticket(ticket_data):
     return res
 
 def fetch_ticket_by_id(ticket_id):
-    """Fetch a single ticket by its ID."""
-    # Validate UUID
-    try:
-        from uuid import UUID
-        UUID(str(ticket_id), version=4)
-    except ValueError:
-        return None
+    """Fetch a single ticket by its ID (supports full UUID or short prefix)."""
+    ticket_id = str(ticket_id).strip()
+    
+    # 1. If it looks like a full UUID (36 chars), try direct fetch
+    if len(ticket_id) == 36:
+        try:
+             client = get_supabase()
+             response = client.table("tickets").select("*").eq("id", ticket_id).execute()
+             if response.data:
+                 return response.data[0]
+        except Exception:
+            pass # Fallthrough if invalid format but len 36
+            
+    # 2. Short ID Logic: Search recent tickets
+    # Since we can't easily do 'ilike' on UUID, we fetch a batch of recent IDs and filter in Python.
+    # Limiting to 2000 most recent tickets should cover active cases for a while.
+    if len(ticket_id) >= 6:
+        client = get_supabase()
+        try:
+            # Optimize: Get only ID first to scan
+            res = client.table("tickets").select("id").order("created_at", desc=True).limit(2000).execute()
+            
+            found_full_id = None
+            if res.data:
+                for t in res.data:
+                    if str(t['id']).startswith(ticket_id):
+                        found_full_id = t['id']
+                        break
+            
+            if found_full_id:
+                # Fetch the full record
+                final_res = client.table("tickets").select("*").eq("id", found_full_id).execute()
+                if final_res.data:
+                    return final_res.data[0]
+                    
+        except Exception as e:
+            print(f"Error searching short ID: {e}")
+            return None
 
-    client = get_supabase()
-    response = client.table("tickets").select("*").eq("id", ticket_id).execute()
-    if response.data:
-        return response.data[0]
     return None
 
 def delete_ticket(ticket_id):

@@ -54,7 +54,7 @@ def render_citizen_view():
                     <span class="material-icons-round" style="font-size: 48px; color: #10b981;">check_circle</span>
                     <h3 style="color: #064e3b; margin-top: 1rem;">¡Solicitud Recibida!</h3>
                     <p style="color: #065f46;">Su número de seguimiento es:</p>
-                    <div style="font-size: 1.5rem; font-weight: 800; color: #1e293b; margin-top: 0.5rem; user-select: all;">{st.session_state.success_ticket_id}</div>
+                    <div style="font-size: 1.5rem; font-weight: 800; color: #1e293b; margin-top: 0.5rem; user-select: all;">{st.session_state.success_ticket_id[:8]}</div>
                     <p style="font-size: 0.8rem; color: #64748b; margin-top: 0.5rem;">Guarde este código para consultar el estado de su solicitud.</p>
                 </div>
                 """, unsafe_allow_html=True)
