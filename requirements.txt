@@ -7,3 +7,4 @@ python-dotenv
 bcrypt
 geopy
 fpdf2
+notificationapi-python-server-sdk
