@@ -228,26 +228,39 @@ def generate_ticket_receipt_pdf(ticket_data):
     pdf.set_text_color(0)
     pdf.cell(0, 10, 'Detalle del Requerimiento', 0, 1)
     
-    # Helper to print fields
     def print_field(label, value):
+        # 1. Capture current Y
+        start_y = pdf.get_y()
+        
+        # 2. Print Label at X=10 (Left Margin)
+        pdf.set_xy(10, start_y)
         pdf.set_font('Arial', 'B', 10)
         pdf.set_text_color(100)
-        pdf.cell(50, 8, label, 0, 0)
+        pdf.cell(60, 8, label, 0, 0) # Width 60
+        
+        # 3. Print Value at X=70 (10+60)
+        pdf.set_xy(70, start_y)
         pdf.set_font('Arial', '', 10)
         pdf.set_text_color(0)
-        # Fixed width layout: Label (50) + Value (140) = 190 (fits in 210 with 10mm margins)
+        
         val_str = str(value) if value is not None else "-"
+        # Use multi_cell to handle long text, wrapped at margin
+        # 0 width = goes to right margin. 
+        # But we need to ensure we don't start at incorrect X if multi_cell resets it?
+        # FPDF multi_cell with w=0 starts at current position and extends to right margin.
         try:
-            # Save x,y
-            x = pdf.get_x()
-            y = pdf.get_y()
-            
-            # Align check
-            # pdf.set_xy(x, y) # already there
-            
-            pdf.multi_cell(140, 8, val_str)
+            pdf.multi_cell(0, 8, val_str)
         except:
-             pdf.cell(140, 8, val_str, ln=1)
+             pdf.cell(0, 8, val_str, ln=1)
+
+        # 4. Advance Y if multi_cell didn't push us down enough (it usually does)
+        # multi_cell moves cursor to next line after printing.
+        # But if value was empty or short, we might be just 8 units down.
+        # If label height > value height? (Label is 1 line, Value is >= 1 line)
+        # So we ensure we are at least below the label.
+        end_y = pdf.get_y()
+        if end_y < start_y + 8:
+            pdf.set_y(start_y + 8)
         
     print_field("Fecha:", ticket_data.get('created_at', '').split('T')[0] if ticket_data.get('created_at') else ticket_data.get('fecha', '-'))
     print_field("Departamento:", UNIDADES.get(ticket_data.get('depto'), {}).get('label', ticket_data.get('depto')))

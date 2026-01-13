@@ -64,20 +64,20 @@ def render_citizen_view():
                 if ticket_data:
                     pdf_bytes = generate_ticket_receipt_pdf(ticket_data)
 
-                # Email Logic (Threaded / Fire-and-forget)
-                if ticket_data and ticket_data.get('user_email') and "invitado.cl" not in ticket_data.get('user_email'):
-                    # Check if we already sent it to avoid resending on refresh
-                    if 'receipt_sent' not in st.session_state or st.session_state.receipt_sent != st.session_state.success_ticket_id:
-                        email_subject = f"Comprobante de Solicitud #{st.session_state.success_ticket_id} - CiviumTech"
-                        email_body = f"""Estimado(a) Vecino(a),\n\nHemos recibido su solicitud con éxito.\n\nID: {st.session_state.success_ticket_id}\nAsunto: {ticket_data.get('sub')}\n\nAdjuntamos el comprobante oficial en PDF.\n\nAtte,\nMunicipalidad de Cholchol"""
-                        
-                        def send_async():
-                            send_simple_email(ticket_data['user_email'], email_subject, email_body, pdf_bytes, f"Comprobante_{st.session_state.success_ticket_id}.pdf")
-                        
-                        email_thread = threading.Thread(target=send_async)
-                        email_thread.start()
-                        
-                        st.success(f"✅ Se enviará el comprobante a **{ticket_data['user_email']}**.")
+                # Email Logic DISABLED as per request
+                # if ticket_data and ticket_data.get('user_email') and "invitado.cl" not in ticket_data.get('user_email'):
+                #     # Check if we already sent it to avoid resending on refresh
+                #     if 'receipt_sent' not in st.session_state or st.session_state.receipt_sent != st.session_state.success_ticket_id:
+                #         email_subject = f"Comprobante de Solicitud #{st.session_state.success_ticket_id} - CiviumTech"
+                #         email_body = f"""Estimado(a) Vecino(a),\n\nHemos recibido su solicitud con éxito.\n\nID: {st.session_state.success_ticket_id}\nAsunto: {ticket_data.get('sub')}\n\nAdjuntamos el comprobante oficial en PDF.\n\nAtte,\nMunicipalidad de Cholchol"""
+                #         
+                #         def send_async():
+                #             send_simple_email(ticket_data['user_email'], email_subject, email_body, pdf_bytes, f"Comprobante_{st.session_state.success_ticket_id}.pdf")
+                #         
+                #         email_thread = threading.Thread(target=send_async)
+                #         email_thread.start()
+                #         
+                #         st.success(f"✅ Se enviará el comprobante a **{ticket_data['user_email']}**.")
                         st.session_state.receipt_sent = st.session_state.success_ticket_id
                 
                 # PDF Download Button
