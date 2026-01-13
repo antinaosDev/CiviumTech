@@ -166,16 +166,22 @@ def render_citizen_view():
                         if check_map and address:
                            try:
                                with st.spinner("Buscando dirección..."):
-                                   geolocator = Nominatim(user_agent="civium_tech_cholchol_app_v1", timeout=5)
+                                   geolocator = Nominatim(user_agent="civium_tech_cholchol_app_v1", timeout=10)
                                    
-                                   search_query_1 = f"{address}, Cholchol, Chile"
+                                   # Clean address of city name to avoid duplication
+                                   clean_addr = re.sub(r'(?i),?\s*Cho?lcho?l', '', address).strip()
+                                   clean_addr = re.sub(r'(?i),?\s*Chile', '', clean_addr).strip()
+                                   
+                                   # Strategy 1: Specific
+                                   search_query_1 = f"{clean_addr}, Cholchol, Chile"
                                    location = geolocator.geocode(search_query_1)
                                    
+                                   # Strategy 2: Street only if number fails (strip numbers from start/end if complex)
                                    if not location:
-                                       street_only = re.sub(r'\d+', '', address).strip()
-                                       if street_only and street_only != address:
-                                           search_query_2 = f"{street_only}, Cholchol, Chile"
-                                           location = geolocator.geocode(search_query_2)
+                                       # Try without specific number if it looks like "Street 123"
+                                       # Sometimes nominatim prefers "123 Street" or just "Street"
+                                       search_query_2 = f"{clean_addr}, Comuna de Cholchol, Chile"
+                                       location = geolocator.geocode(search_query_2)
 
                                    if location:
                                        lat, lon = location.latitude, location.longitude

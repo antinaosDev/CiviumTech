@@ -235,15 +235,18 @@ def generate_ticket_receipt_pdf(ticket_data):
         pdf.cell(50, 8, label, 0, 0)
         pdf.set_font('Arial', '', 10)
         pdf.set_text_color(0)
-        # Use effective width explicit calculation to avoid FPDF rounding errors
-        w = pdf.w - pdf.r_margin - pdf.x
-        if w < 10: w = 0 
-        val_str = str(value) if value is not None else "-"
+        # Fixed width layout: Label (50) + Value (140) = 190 (fits in 210 with 10mm margins)
         try:
-            pdf.multi_cell(0, 8, val_str)
+            # Save x,y
+            x = pdf.get_x()
+            y = pdf.get_y()
+            
+            # Align check
+            # pdf.set_xy(x, y) # already there
+            
+            pdf.multi_cell(140, 8, val_str)
         except:
-            # Fallback for weird edge cases
-            pdf.cell(0, 8, val_str, ln=1)
+             pdf.cell(140, 8, val_str, ln=1)
         
     print_field("Fecha:", ticket_data.get('created_at', '').split('T')[0] if ticket_data.get('created_at') else ticket_data.get('fecha', '-'))
     print_field("Departamento:", UNIDADES.get(ticket_data.get('depto'), {}).get('label', ticket_data.get('depto')))
