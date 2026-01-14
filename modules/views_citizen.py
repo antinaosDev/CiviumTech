@@ -387,8 +387,8 @@ def render_citizen_view():
 
             with c_cat:
                 st.markdown("**🏷️ Temas más consultados**")
-                if 'categoria' in df.columns:
-                    cat_counts = df['categoria'].value_counts().reset_index()
+                if 'category' in df.columns:
+                    cat_counts = df['category'].value_counts().reset_index()
                     cat_counts.columns = ['Tema', 'Cantidad']
                     fig_pie = px.pie(cat_counts, values='Cantidad', names='Tema', hole=0.4, height=250)
                     fig_pie.update_layout(showlegend=True, margin=dict(t=10, b=10, l=0, r=0), legend=dict(orientation="h", y=-0.2))
