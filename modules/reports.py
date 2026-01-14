@@ -27,7 +27,10 @@ class PDFReport(FPDF):
         # 4. Subtitle White
         self.set_font('Arial', '', 10)
         self.set_text_color(220, 220, 220)
-        self.cell(0, 6, f'Generado el: {datetime.now().strftime("%d-%m-%Y %H:%M")}', 0, 1, 'C')
+        # Fix: UTC-3 for Chile
+        from datetime import timedelta
+        cl_time = datetime.now() - timedelta(hours=3)
+        self.cell(0, 6, f'Generado el: {cl_time.strftime("%d-%m-%Y %H:%M")} (UTC-3)', 0, 1, 'C')
         self.ln(12)
 
     def footer(self):
@@ -156,6 +159,63 @@ class PDFReport(FPDF):
                 cur_x += part_w
                 legend_y += 5
 
+    def draw_trend_line_chart(self, x, y, w, h, data_dict, title):
+        """Draws a simple line chart for trends."""
+        self.set_xy(x, y)
+        self.set_font('Arial', 'B', 10)
+        self.set_text_color(50)
+        self.cell(0, 6, title, 0, 1)
+        
+        # Plot area
+        chart_y = y + 10
+        chart_h = h - 15
+        chart_w = w
+        
+        # Axis lines
+        self.set_draw_color(200)
+        self.line(x, chart_y, x, chart_y + chart_h)             # Y Axis
+        self.line(x, chart_y + chart_h, x + chart_w, chart_y + chart_h) # X Axis
+        
+        if not data_dict:
+            self.set_xy(x + 10, chart_y + 10)
+            self.set_font('Arial', 'I', 8)
+            self.cell(0, 10, "Sin datos para tendencias.", 0, 1)
+            return
+
+        # Sort dates
+        dates = sorted(data_dict.keys())
+        values = [data_dict[d] for d in dates]
+        max_val = max(values) if values else 10
+        
+        step_x = chart_w / len(dates)
+        
+        prev_x, prev_y = None, None
+        
+        self.set_draw_color(37, 99, 235) # Blue Line
+        self.set_line_width(0.8)
+        self.set_fill_color(37, 99, 235)
+        
+        for i, (date_label, val) in enumerate(zip(dates, values)):
+            # Normalize Y
+            norm_val = val / max_val
+            curr_y = (chart_y + chart_h) - (norm_val * chart_h)
+            curr_x = x + (i * step_x) + (step_x / 2)
+            
+            # Draw Line
+            if prev_x is not None:
+                self.line(prev_x, prev_y, curr_x, curr_y)
+                
+            # Draw Point
+            self.circle(curr_x, curr_y, 1, 'F')
+            
+            # Label X (Date)
+            self.set_xy(curr_x - 5, chart_y + chart_h + 2)
+            self.set_font('Arial', '', 6)
+            self.set_text_color(100)
+            self.cell(10, 4, date_label[-5:], 0, 0, 'C') # Only dd-mm
+            
+            prev_x, prev_y = curr_x, curr_y
+
 def generate_pdf_report(tickets_data):
     """
     Generate Advanced PDF report.
@@ -197,7 +257,7 @@ def generate_pdf_report(tickets_data):
             if k_norm == 'Critica': urgency_counts['Crítica'] += v
 
     # --- PAGE 1: EXECUTIVE SUMMARY ---
-    pdf.chapter_title("RESUMEN EJECUTIVO")
+    pdf.chapter_title("RESUMEN EJECUTIVO // ANÁLISIS")
     
     # 3 Big Cards
     y_start = pdf.get_y()
@@ -212,7 +272,7 @@ def generate_pdf_report(tickets_data):
     pdf.set_y(y_start + 35)
     pdf.ln(5)
 
-    # Charts Row
+    # Charts Row 1: Depts & Urgency
     y_charts = pdf.get_y()
     
     # Left: Top Depts
@@ -222,9 +282,17 @@ def generate_pdf_report(tickets_data):
     pdf.draw_urgency_dist(110, y_charts, urgency_counts, total)
     
     pdf.set_y(y_charts + 50)
-    
+    pdf.ln(10)
+
+    # NEW: Trend Sparkline (Evolution)
+    # Group by date for last 7 entries
+    if 'date_str' in df.columns:
+        daily = df.groupby('date_str').size().tail(7)
+        if not daily.empty:
+            pdf.draw_trend_line_chart(10, pdf.get_y(), 190, 40, daily.to_dict(), "Evolución de Ingresos (Últimos Días)")
+            pdf.ln(50)
+
     # Watchlist Critical
-    pdf.ln(5)
     pdf.set_font('Arial', 'B', 12)
     pdf.set_text_color(185, 28, 28) # Red Text
     pdf.cell(0, 10, "⚠️ WATCHLIST: CASOS CRÍTICOS PENDIENTES", 0, 1)
