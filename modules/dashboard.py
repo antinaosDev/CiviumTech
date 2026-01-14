@@ -221,7 +221,8 @@ def render_mayor_dashboard(tickets_data):
     st.markdown("---")
     
     # NEW: Advanced Analytics Section
-    st.markdown("### 📈 Estudios y Tendencias (Data Science)")
+    st.markdown("### 🔍 Análisis de Tendencias y Métricas")
+    st.caption("Explora los datos históricos para identificar patrones y mejorar la gestión.")
     
     # Row 1: Time Series & Urgency Donut
     c_trend, c_urgency = st.columns([2, 1])
@@ -238,6 +239,7 @@ def render_mayor_dashboard(tickets_data):
                 )
                 fig_trend.update_traces(line_color='#2563eb', fillcolor='rgba(37, 99, 235, 0.2)')
                 st.plotly_chart(fig_trend, use_container_width=True)
+                st.caption("📅 **Interpretación:** Muestra el volumen diario de solicitudes. Los picos indican días de alta demanda ciudadana.")
             except Exception as e:
                 st.error(f"Error Tendencias: {e}")
         else:
@@ -263,6 +265,7 @@ def render_mayor_dashboard(tickets_data):
                 color_discrete_map=color_map
             )
             st.plotly_chart(fig_urg, use_container_width=True)
+            st.caption("🚨 **Interpretación:** Distribución porcentual de la gravedad de los casos. Permite priorizar recursos.")
         else:
             st.info("Sin datos de urgencia.")
             
@@ -297,6 +300,7 @@ def render_mayor_dashboard(tickets_data):
                     color_continuous_scale="Blues"
                 )
                 st.plotly_chart(fig_heat, use_container_width=True)
+                st.caption("🔥 **Interpretación:** Las zonas más oscuras indican los momentos (Día/Hora) con más incidencias reportadas.")
             except Exception as e:
                 st.warning(f"No hay suficientes datos para heatmap: {e}")
         else:
@@ -315,5 +319,6 @@ def render_mayor_dashboard(tickets_data):
             )
             fig_cat.update_traces(textposition='inside', textinfo='percent+label')
             st.plotly_chart(fig_cat, use_container_width=True)
+            st.caption("🏷️ **Interpretación:** Principales tipos de problemas reportados por los vecinos.")
         else:
             st.info("Sin datos de categorías.")
