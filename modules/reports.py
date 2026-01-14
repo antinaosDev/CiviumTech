@@ -295,7 +295,7 @@ def generate_pdf_report(tickets_data):
     # Watchlist Critical
     pdf.set_font('Arial', 'B', 12)
     pdf.set_text_color(185, 28, 28) # Red Text
-    pdf.cell(0, 10, "⚠️ WATCHLIST: CASOS CRÍTICOS PENDIENTES", 0, 1)
+    pdf.cell(0, 10, "WATCHLIST: CASOS CRÍTICOS PENDIENTES", 0, 1)
     
     # Filter critical pending
     crit_pending = df[
