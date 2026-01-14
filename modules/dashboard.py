@@ -19,7 +19,7 @@ def render_mayor_dashboard(tickets_data):
         with c_title:
             st.markdown("""
                 <h2 style="font-size: 1.5rem; font-weight: 800; color: #1e293b; margin: 0;">
-                    <span class="material-icons-round" style="color: #2563eb; vertical-align: middle;">analytics</span> Inteligencia de Datos
+                    📊 Inteligencia de Datos
                 </h2>
                 <p style="color: #64748b; font-size: 0.875rem; margin: 0;">Visión Panorámica de la Gestión Municipal</p>
             """, unsafe_allow_html=True)
@@ -96,7 +96,7 @@ def render_mayor_dashboard(tickets_data):
         <div class="civium-card" style="border-top: 4px solid #3b82f6;">
             <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
                 <span style="font-size: 0.75rem; font-weight: 700; color: #64748b; text-transform: uppercase;">Solicitudes Totales</span>
-                <span class="material-icons-round" style="color: #3b82f6;">description</span>
+                <span style="font-size: 1.5rem;">📄</span>
             </div>
             <div style="font-size: 1.875rem; font-weight: 900; color: #1e293b;">{total}</div>
             <div style="font-size: 0.75rem; color: {growth_color}; font-weight: 700; margin-top: 0.25rem;">{growth_str}</div>
@@ -108,7 +108,7 @@ def render_mayor_dashboard(tickets_data):
         <div class="civium-card" style="border-top: 4px solid #ef4444; background-color: #fef2f2;">
             <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
                 <span style="font-size: 0.75rem; font-weight: 700; color: #dc2626; text-transform: uppercase;">Casos Críticos</span>
-                <span class="material-icons-round" style="color: #ef4444;">warning</span>
+                <span style="font-size: 1.5rem;">⚠️</span>
             </div>
             <div style="font-size: 1.875rem; font-weight: 900; color: #b91c1c;">{criticos}</div>
             <div style="font-size: 0.75rem; color: #dc2626; margin-top: 0.25rem;">Requieren intervención hoy</div>
@@ -120,7 +120,7 @@ def render_mayor_dashboard(tickets_data):
         <div class="civium-card" style="border-top: 4px solid #f59e0b;">
             <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
                 <span style="font-size: 0.75rem; font-weight: 700; color: #64748b; text-transform: uppercase;">Área Más Demandada</span>
-                <span class="material-icons-round" style="color: #f59e0b;">trending_up</span>
+                <span style="font-size: 1.5rem;">📈</span>
             </div>
             <div style="font-size: 1.25rem; font-weight: 800; color: #1e293b; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{top_dept_label}</div>
             <div style="font-size: 0.75rem; color: #64748b; margin-top: 0.25rem;">{top_dept_count} tickets activos</div>
@@ -139,7 +139,7 @@ def render_mayor_dashboard(tickets_data):
         <div class="civium-card" style="border-top: 4px solid #a855f7;">
             <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
                 <span style="font-size: 0.75rem; font-weight: 700; color: #64748b; text-transform: uppercase;">Tasa de Resolución</span>
-                <span class="material-icons-round" style="color: #a855f7;">check_circle</span>
+                <span style="font-size: 1.5rem;">✅</span>
             </div>
             <div style="font-size: 1.875rem; font-weight: 900; color: #1e293b;">{int(resolution_rate)}%</div>
             <div style="font-size: 0.75rem; color: #64748b; margin-top: 0.25rem;">Tickets Resueltos/Cerrados</div>
@@ -182,7 +182,7 @@ def render_mayor_dashboard(tickets_data):
             st.markdown("""
             <div style="background-color: white; padding: 1.5rem; border-radius: 12px; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);">
                <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1rem;">
-                   <span class="material-icons-round" style="color: #2563eb !important; font-size: 1.5rem;">place</span>
+                   <span style="font-size: 1.5rem;">📍</span>
                    <div style="color: #1e293b !important; margin: 0; font-size: 1.1rem; font-weight: 700; font-family: 'Manrope', sans-serif;">Mapa de Calor</div>
                </div>
                <p style="color: #64748b; font-size: 0.85rem; margin: 0;">Visualización geoespacial de incidentes</p>
