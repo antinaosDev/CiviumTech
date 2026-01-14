@@ -349,11 +349,15 @@ def render_citizen_view():
                     st.plotly_chart(fig)
             
             with c_info:
+                from modules.db import fetch_config
+                pharma = fetch_config('pharmacy_info') or "Información de farmacias no disponible."
+                emergency = fetch_config('emergency_info') or "Información de emergencia no disponible."
+                
                 st.caption("Farmacias de Turno (Hoy)")
-                st.success("💊 **Farmacia Cruz Verde**\n\n📍 Av. Valparaíso 450\n🕒 Hasta las 23:00 hrs")
+                st.success(pharma)
                 
                 st.caption("Teléfonos de Emergencia")
-                st.warning("🚑 **Ambulancia/SAPU**: 131\n🚒 **Bomberos**: 132\n🚓 **Carabineros**: 133")
+                st.warning(emergency)
                 
         else:
              st.info("No hay datos estadísticos disponibles aún.")

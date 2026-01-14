@@ -137,34 +137,42 @@ def display_footer():
             """, unsafe_allow_html=True)
 
 # Events Mock (Shared)
-EVENTS = [
-  {'id': 1, 'tipo': 'Salud', 'titulo': 'Ronda Médica Rural', 'lugar': 'Sede Social Malalche', 'fecha': '2025-01-20', 'hora': '09:30', 'icon': 'medical_services'},
-  {'id': 2, 'tipo': 'Veterinario', 'titulo': 'Operativo Sanitario (Ovinos)', 'lugar': 'Sector Repocura', 'fecha': '2025-01-22', 'hora': '10:00', 'icon': 'pets'},
-  {'id': 3, 'tipo': 'Social', 'titulo': 'Atención en Terreno DIDECO', 'lugar': 'Posta Rucapangue', 'fecha': '2025-01-25', 'hora': '11:00', 'icon': 'favorite'},
-  {'id': 4, 'tipo': 'Servicios', 'titulo': 'Camión Aljibe (Agua)', 'lugar': 'Ruta S-10 Km 15', 'fecha': '2025-01-21', 'hora': '08:00', 'icon': 'local_shipping'},
-]
+# Events Mock (Shared) - DEPRECATED, using DB
+# EVENTS = ...
 
 def render_field_ops_card_grid():
+    from modules.db import fetch_activities
+    
     st.subheader(f"Actividades Semanales")
     st.markdown('<div class="responsive-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem;">', unsafe_allow_html=True)
     
     color_map = { 'Salud': 'bg-teal-50 text-teal-700', 'Veterinario': 'bg-amber-50 text-amber-700', 'Social': 'bg-pink-50 text-pink-700', 'Servicios': 'bg-blue-50 text-blue-700' }
 
-    for evt in EVENTS:
-        style_class = color_map.get(evt['tipo'], 'bg-gray-50 text-gray-700')
+    activities = fetch_activities()
+    
+    if not activities:
+        st.info("No hay actividades programadas para esta semana.")
+    
+    for evt in activities:
+        # DB fields: title, type, date_str, time_str, location, icon
+        # Map DB fields to UI expectation
+        tipo = evt.get('type', 'General')
+        icon = evt.get('icon', 'event')
+        
+        style_class = color_map.get(tipo, 'bg-gray-50 text-gray-700')
         
         card_html = f"""
         <div style="background: white; border: 1px solid #e2e8f0; border-radius: 12px; padding: 1.5rem; display: flex; flex-direction: column; gap: 0.5rem;">
             <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.5rem;">
-                <span class="material-icons-round" style="color: #64748b;">{evt['icon']}</span>
-                <span style="font-size: 0.7rem; font-weight: 700; padding: 2px 8px; border-radius: 99px; background: #f1f5f9; color: #475569;">{evt['tipo']}</span>
+                <span class="material-icons-round" style="color: #64748b;">{icon}</span>
+                <span style="font-size: 0.7rem; font-weight: 700; padding: 2px 8px; border-radius: 99px; background: #f1f5f9; color: #475569;">{tipo}</span>
             </div>
-            <h4 style="margin: 0; font-size: 1rem; color: #1e293b;">{evt['titulo']}</h4>
+            <h4 style="margin: 0; font-size: 1rem; color: #1e293b;">{evt['title']}</h4>
             <div style="font-size: 0.8rem; color: #64748b; display: flex; align-items: center; gap: 4px;">
-                <span class="material-icons-round" style="font-size: 14px;">event</span> {evt['fecha']} {evt['hora']}
+                <span class="material-icons-round" style="font-size: 14px;">event</span> {evt['date_str']} {evt['time_str']}
             </div>
             <div style="font-size: 0.8rem; color: #64748b; display: flex; align-items: center; gap: 4px;">
-                <span class="material-icons-round" style="font-size: 14px;">place</span> {evt['lugar']}
+                <span class="material-icons-round" style="font-size: 14px;">place</span> {evt['location']}
             </div>
         </div>
         """

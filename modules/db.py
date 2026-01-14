@@ -210,3 +210,40 @@ def delete_asset(asset_id):
     client = get_supabase()
     res = client.table("assets").delete().eq('id', asset_id).execute()
     return True
+
+# --- DYNAMIC CONTENT CRUD ---
+
+# 1. Activities
+@retry_db
+def fetch_activities():
+    """Fetch all upcoming activities."""
+    client = get_supabase()
+    # Fetch all, ideally order by date
+    res = client.table("activities").select("*").order("date_str").execute()
+    return res.data if res.data else []
+
+def create_activity(data):
+    """Create a new activity."""
+    client = get_supabase()
+    return client.table("activities").insert(data).execute()
+
+def delete_activity(activity_id):
+    """Delete an activity."""
+    client = get_supabase()
+    return client.table("activities").delete().eq("id", activity_id).execute()
+
+# 2. Site Config (Pharmacies, Emergency)
+@retry_db
+def fetch_config(key):
+    """Fetch config value by key. Returns string or empty."""
+    client = get_supabase()
+    res = client.table("site_config").select("value").eq("key", key).execute()
+    if res.data:
+        return res.data[0]['value']
+    return ""
+
+def update_config(key, value):
+    """Update or insert config value."""
+    client = get_supabase()
+    data = {"key": key, "value": value, "updated_at": "now()"}
+    return client.table("site_config").upsert(data).execute()

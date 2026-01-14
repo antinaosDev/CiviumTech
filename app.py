@@ -63,6 +63,11 @@ def main():
                 else:
                     from modules.admin_users import render_admin_users
                     render_admin_users()
+                    
+            # --- CONTENT MANAGER ---
+            elif current_view == 'content_manager':
+                from modules.views_content import render_content_manager
+                render_content_manager()
                 
             # --- ASSETS VIEW ---
             elif current_view == 'assets':

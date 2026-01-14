@@ -1,0 +1,1 @@
+FAIL_CAST: Query invalid: {'message': 'column tickets.id::text does not exist', 'code': '42703', 'hint': None, 'details': None}
