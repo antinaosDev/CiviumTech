@@ -328,12 +328,14 @@ def render_citizen_view():
         if not df.empty:
             # --- PRE-PROCESS DATA ---
             # Ensure dates are datetime objects
+            # Ensure dates are datetime objects and UTC-aware
             if 'created_at' in df.columns:
-                df['created_at'] = pd.to_datetime(df['created_at'])
+                df['created_at'] = pd.to_datetime(df['created_at'], utc=True)
             
             # 1. Real "This Month" Count
-            start_month = datetime.now().replace(day=1, hour=0, minute=0, second=0, microsecond=0)
-            month_count = len(df[df['created_at'] >= pd.Timestamp(start_month)])
+            # Use UTC now to match dataframe column
+            start_month = pd.Timestamp.now(tz='UTC').replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+            month_count = len(df[df['created_at'] >= start_month])
             
             # 2. Real Efficiency
             resolved_df = df[df['status'].isin(['Resuelto', 'Cerrado'])]
