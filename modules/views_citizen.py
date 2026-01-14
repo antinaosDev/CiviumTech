@@ -326,36 +326,79 @@ def render_citizen_view():
              pass
         
         if not df.empty:
+            # --- PRE-PROCESS DATA ---
+            # Ensure dates are datetime objects
+            if 'created_at' in df.columns:
+                df['created_at'] = pd.to_datetime(df['created_at'])
+            
+            # 1. Real "This Month" Count
+            start_month = datetime.now().replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+            month_count = len(df[df['created_at'] >= pd.Timestamp(start_month)])
+            
+            # 2. Real Efficiency
+            resolved_df = df[df['status'].isin(['Resuelto', 'Cerrado'])]
+            resolved_count = len(resolved_df)
+            efficiency = int((resolved_count / len(df)) * 100) if len(df) > 0 else 0
+            
+            # 3. Real Avg Time (Approximation using updated_at if exists, else diff from now)
+            # If we don't have closed_at, we use updated_at for resolved tickets
+            avg_days_str = "N/A"
+            if 'updated_at' in df.columns and not resolved_df.empty:
+                # Convert updated_at
+                resolved_df['updated_at'] = pd.to_datetime(resolved_df['updated_at'])
+                # Calc diff
+                deltas = resolved_df['updated_at'] - resolved_df['created_at']
+                avg_days = deltas.mean().days
+                avg_days_str = f"{avg_days} Días"
+            elif not resolved_df.empty:
+                 # Fallback if no updated_at: just show "En cálculo"
+                 avg_days_str = "Variado"
+
             st.markdown("##### Transparencia Municipal")
             k1, k2, k3 = st.columns(3)
             with k1:
-                st.metric("Solicitudes Este Mes", len(df), delta="Total")
+                st.metric("Solicitudes Este Mes", month_count, delta="Mes Actual")
             with k2:
-                resolved = len(df[df['status'] == 'Resuelto'])
-                st.metric("Casos Resueltos", resolved, delta=f"{int(resolved/len(df)*100)}% Eficiencia")
+                st.metric("Casos Resueltos", resolved_count, delta=f"{efficiency}% Eficiencia")
             with k3:
-                st.metric("Tiempo Promedio", "2.5 Días", help="Tiempo estimado de respuesta")
+                st.metric("Tiempo Promedio", avg_days_str, help="Promedio días (Creación -> Cierre)")
             
             st.divider()
             
-            c_chart, c_info = st.columns([1, 1])
-            with c_chart:
-                st.caption("Temas más consultados")
+            # --- CHARTS ROW ---
+            c_trend, c_cat = st.columns([1, 1])
+            
+            with c_trend:
+                st.markdown("**📅 Evolución de Solicitudes**")
+                # Group by date
+                daily_counts = df.groupby(df['created_at'].dt.date).size().reset_index(name='Cantidad')
+                daily_counts.columns = ['Fecha', 'Cantidad']
+                
+                fig_trend = px.bar(daily_counts, x='Fecha', y='Cantidad', height=250)
+                fig_trend.update_layout(margin=dict(t=10, b=10, l=10, r=10))
+                st.plotly_chart(fig_trend, use_container_width=True)
+
+            with c_cat:
+                st.markdown("**🏷️ Temas más consultados**")
                 if 'categoria' in df.columns:
                     cat_counts = df['categoria'].value_counts().reset_index()
                     cat_counts.columns = ['Tema', 'Cantidad']
-                    fig = px.pie(cat_counts, values='Cantidad', names='Tema', hole=0.5)
-                    fig.update_layout(showlegend=False, margin=dict(t=0, b=0, l=0, r=0), height=200)
-                    st.plotly_chart(fig)
+                    fig_pie = px.pie(cat_counts, values='Cantidad', names='Tema', hole=0.4, height=250)
+                    fig_pie.update_layout(showlegend=True, margin=dict(t=10, b=10, l=0, r=0), legend=dict(orientation="h", y=-0.2))
+                    st.plotly_chart(fig_pie, use_container_width=True)
             
-            with c_info:
+            st.divider()
+            
+            c_info_1, c_info_2 = st.columns(2)
+            
+            with c_info_1:
                 from modules.db import fetch_config
                 pharma = fetch_config('pharmacy_info') or "Información de farmacias no disponible."
-                emergency = fetch_config('emergency_info') or "Información de emergencia no disponible."
-                
                 st.caption("Farmacias de Turno (Hoy)")
                 st.success(pharma)
-                
+            
+            with c_info_2:
+                emergency = fetch_config('emergency_info') or "Información de emergencia no disponible."
                 st.caption("Teléfonos de Emergencia")
                 st.warning(emergency)
                 
