@@ -237,7 +237,9 @@ def render_mayor_dashboard(tickets_data):
                     labels={'date_str': 'Fecha', 'count': 'Tickets'},
                     template="plotly_white"
                 )
-                fig_trend.update_traces(line_color='#2563eb', fillcolor='rgba(37, 99, 235, 0.2)')
+                fig_trend.update_traces(line_color='#2563eb', fillcolor='rgba(37, 99, 235, 0.2)', hovertemplate="<b>Fecha</b>: %{x|%d-%m-%Y}<br><b>Tickets</b>: %{y}<extra></extra>")
+                # Force numeric dates on X axis (Spanish format)
+                fig_trend.update_xaxes(tickformat="%d/%m/%Y")
                 st.plotly_chart(fig_trend, use_container_width=True)
                 st.caption("📅 **Interpretación:** Muestra el volumen diario de solicitudes. Los picos indican días de alta demanda ciudadana.")
             except Exception as e:
@@ -262,8 +264,10 @@ def render_mayor_dashboard(tickets_data):
                 hole=0.6,
                 template="plotly_white",
                 color='urgency',
-                color_discrete_map=color_map
+                color_discrete_map=color_map,
+                labels={'urgency': 'Urgencia', 'count': 'Cantidad'} 
             )
+            fig_urg.update_traces(hovertemplate="<b>%{label}</b><br>Cantidad: %{value}<br>Porcentaje: %{percent}<extra></extra>")
             st.plotly_chart(fig_urg, use_container_width=True)
             st.caption("🚨 **Interpretación:** Distribución porcentual de la gravedad de los casos. Permite priorizar recursos.")
         else:
@@ -299,6 +303,7 @@ def render_mayor_dashboard(tickets_data):
                     template="plotly_white",
                     color_continuous_scale="Blues"
                 )
+                fig_heat.update_traces(hovertemplate="<b>Día</b>: %{y}<br><b>Hora</b>: %{x}:00<br><b>Tickets</b>: %{z}<extra></extra>")
                 st.plotly_chart(fig_heat, use_container_width=True)
                 st.caption("🔥 **Interpretación:** Las zonas más oscuras indican los momentos (Día/Hora) con más incidencias reportadas.")
             except Exception as e:
@@ -315,9 +320,10 @@ def render_mayor_dashboard(tickets_data):
                 cat_counts, names='category', values='count',
                 title="Categorías",
                 template="plotly_white",
-                color_discrete_sequence=px.colors.qualitative.Prism
+                color_discrete_sequence=px.colors.qualitative.Prism,
+                labels={'category': 'Categoría', 'count': 'Cantidad'}
             )
-            fig_cat.update_traces(textposition='inside', textinfo='percent+label')
+            fig_cat.update_traces(textposition='inside', textinfo='percent+label', hovertemplate="<b>%{label}</b><br>Cantidad: %{value}<br>Porcentaje: %{percent}<extra></extra>")
             st.plotly_chart(fig_cat, use_container_width=True)
             st.caption("🏷️ **Interpretación:** Principales tipos de problemas reportados por los vecinos.")
         else:

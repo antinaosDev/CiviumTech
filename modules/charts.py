@@ -15,6 +15,7 @@ def plot_bar_chart(df, x, y, title, color_col=None, orientation='v'):
         orientation=orientation,
         color_discrete_sequence=[COLOR_MID_BLUE, COLOR_LIGHT_BLUE, COLOR_DARK_BLUE]
     )
+    fig.update_traces(hovertemplate="<b>%{label}</b><br>Valor: %{value}<extra></extra>") # Generic Spanish tooltip
     fig.update_layout(
         template="plotly_white",
         margin=dict(t=40, b=0, l=0, r=0),
@@ -33,7 +34,7 @@ def plot_donut_chart(df, names, values, title):
         hole=0.5,
         color_discrete_sequence=[COLOR_MID_BLUE, COLOR_PRIMARY_GREEN, "#FFD700", "#FF6B6B"]
     )
-    fig.update_traces(textposition='inside', textinfo='percent+label')
+    fig.update_traces(textposition='inside', textinfo='percent+label', hovertemplate="<b>%{label}</b><br>Cantidad: %{value}<br>Porcentaje: %{percent}<extra></extra>")
     fig.update_layout(
         template="plotly_white",
         margin=dict(t=40, b=0, l=0, r=0),
@@ -51,7 +52,7 @@ def plot_line_chart(df, x, y, title):
         title=title,
         markers=True
     )
-    fig.update_traces(line_color=COLOR_MID_BLUE, line_shape='spline')
+    fig.update_traces(line_color=COLOR_MID_BLUE, line_shape='spline', hovertemplate="<b>%{x}</b><br>Valor: %{y}<extra></extra>")
     fig.update_layout(
         template="plotly_white",
         margin=dict(t=40, b=0, l=0, r=0),
