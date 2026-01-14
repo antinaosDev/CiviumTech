@@ -117,8 +117,9 @@ def main():
             # Full Citizen View
             render_citizen_view()
             
-        # Footer (Always show)
-        display_footer()
+        # Footer (Always show except for Portal Vecino)
+        if role != 'CITIZEN':
+            display_footer()
 
 if __name__ == "__main__":
     main()
