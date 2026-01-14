@@ -330,7 +330,12 @@ def render_citizen_view():
             # Ensure dates are datetime objects
             # Ensure dates are datetime objects and UTC-aware
             if 'created_at' in df.columns:
-                df['created_at'] = pd.to_datetime(df['created_at'], utc=True)
+                # Force UTC conversion/localization
+                df['created_at'] = pd.to_datetime(df['created_at'], errors='coerce')
+                if df['created_at'].dt.tz is None:
+                    df['created_at'] = df['created_at'].dt.tz_localize('UTC')
+                else:
+                    df['created_at'] = df['created_at'].dt.tz_convert('UTC')
             
             # 1. Real "This Month" Count
             # Use UTC now to match dataframe column
