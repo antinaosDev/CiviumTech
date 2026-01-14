@@ -277,33 +277,30 @@ def render_citizen_view():
                          
                          st.markdown(f"""
 <div style="background: white; border: 1px solid #e2e8f0; border-radius: 12px; padding: 2rem;">
-    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem;">
-        <div>
-            <h2 style="margin: 0; color: #1e293b;">{ticket.get('sub', 'Sin Asunto')}</h2>
-            <div style="color: #64748b; font-size: 0.9rem; margin-top: 4px;">ID: <strong>{ticket.get('id')}</strong> • {ticket.get('fecha')}</div>
-        </div>
-        <div>{status_badge}</div>
-    </div>
-    
-    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.5rem; background: #f8fafc; padding: 1rem; border-radius: 8px;">
-        <div>
-            <small style="color: #64748b; font-weight: 700; text-transform: uppercase;">Departamento</small>
-            <div style="color: #334155;">{unit_label}</div>
-        </div>
-        <div>
-            <small style="color: #64748b; font-weight: 700; text-transform: uppercase;">Clasificación</small>
-            <div style="color: #334155;">{ticket.get('categoria', 'General')}</div>
-        </div>
-    </div>
-    
-    <div style="margin-bottom: 1rem;">
-        <h4 style="font-size: 1rem; margin-bottom: 0.5rem; color: #334155;">Descripción Original</h4>
-        <p style="color: #475569; font-size: 0.95rem; line-height: 1.5; background: #fff; border: 1px solid #f1f5f9; padding: 1rem; border-radius: 8px;">
-            {ticket.get('desc')}
-        </p>
-    </div>
-    
-    {'<div style="padding: 1rem; background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 8px; color: #1e40af;"><strong>💬 Respuesta Municipal:</strong><br>' + ticket.get('reply') + '</div>' if ticket.get('reply') else ''}
+<div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem;">
+<div>
+<h2 style="margin: 0; color: #1e293b;">{ticket.get('sub', 'Sin Asunto')}</h2>
+<div style="color: #64748b; font-size: 0.9rem; margin-top: 4px;">ID: <strong>{ticket.get('id')}</strong> • {ticket.get('fecha')}</div>
+</div>
+<div>{status_badge}</div>
+</div>
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.5rem; background: #f8fafc; padding: 1rem; border-radius: 8px;">
+<div>
+<small style="color: #64748b; font-weight: 700; text-transform: uppercase;">Departamento</small>
+<div style="color: #334155;">{unit_label}</div>
+</div>
+<div>
+<small style="color: #64748b; font-weight: 700; text-transform: uppercase;">Clasificación</small>
+<div style="color: #334155;">{ticket.get('categoria', 'General')}</div>
+</div>
+</div>
+<div style="margin-bottom: 1rem;">
+<h4 style="font-size: 1rem; margin-bottom: 0.5rem; color: #334155;">Descripción Original</h4>
+<p style="color: #475569; font-size: 0.95rem; line-height: 1.5; background: #fff; border: 1px solid #f1f5f9; padding: 1rem; border-radius: 8px;">
+{ticket.get('desc')}
+</p>
+</div>
+{'<div style="padding: 1rem; background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 8px; color: #1e40af;"><strong>💬 Respuesta Municipal:</strong><br>' + ticket.get('reply') + '</div>' if ticket.get('reply') else ''}
 </div>
 """, unsafe_allow_html=True)
                      else:
