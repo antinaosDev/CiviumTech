@@ -33,7 +33,7 @@ def render_citizen_view():
         except: pass
 
     # Tabs
-    tab_form, tab_status, tab_ops, tab_stats = st.tabs(["📝 Ingresar Solicitud", "🔍 Consultar Estado", "📅 Actividades Comunales", "📊 Cifras y Datos"])
+    tab_form, tab_status, tab_ops, tab_stats = st.tabs(["📝 Ingresar Solicitud", "🔍 Consultar Estado", "📅 Actividades Comunales", "ℹ️ Información y Ayuda"])
 
     # --- TAB 1: FORM ---
     with tab_form:
@@ -311,113 +311,51 @@ def render_citizen_view():
         render_field_ops_card_grid()
         
     # --- TAB 4: STATS/INFO ---
+    # --- TAB 4: INFO & HELP ---
     with tab_stats:
-        st.subheader("📊 Cifras y Datos de Utilidad")
+        st.subheader("ℹ️ Información y Ayuda")
+        st.caption("Guía rápida para utilizar el Portal Vecino y datos de utilidad.")
         
-        from modules.db import fetch_tickets
-        import plotly.express as px
+        # 1. Quick Guide
+        with st.container(border=True):
+            st.markdown("##### 📌 ¿Cómo funciona?")
+            
+            c_step1, c_step2, c_step3 = st.columns(3)
+            with c_step1:
+                st.markdown("**1. Crea una Solicitud**")
+                st.info("Ingresa a la pestaña **'Ingresar Solicitud'**, completa tus datos y describe tu problema. ¡Puedes ubicarlo en el mapa!")
+            with c_step2:
+                st.markdown("**2. Guarda tu Código**")
+                st.warning("Al enviar, recibirás un código único (ej: `REQ-123`). **Guárdalo**, es tu llave para consultar el avance.")
+            with c_step3:
+                st.markdown("**3. Revisa el Estado**")
+                st.success("Ve a **'Consultar Estado'**, ingresa tu código y verás la respuesta oficial del municipio.")
         
-        # Use Exception handling for reliability
-        df = pd.DataFrame()
-        try:
-             all_tix = fetch_tickets()
-             df = pd.DataFrame(all_tix)
-        except Exception:
-             pass
+        st.divider()
         
-        if not df.empty:
-            # --- PRE-PROCESS DATA ---
-            # Ensure dates are datetime objects
-            # Ensure dates are datetime objects and UTC-aware
-            if 'created_at' in df.columns:
-                # Force UTC conversion/localization
-                df['created_at'] = pd.to_datetime(df['created_at'], errors='coerce')
-                if df['created_at'].dt.tz is None:
-                    df['created_at'] = df['created_at'].dt.tz_localize('UTC')
-                else:
-                    df['created_at'] = df['created_at'].dt.tz_convert('UTC')
+        # 2. Utility Data (Pharmacy / Emergency)
+        st.markdown("##### 🏥 Datos de Utilidad (Tiempo Real)")
+        
+        c_info_1, c_info_2 = st.columns(2)
+        
+        from modules.db import fetch_config
+        
+        with c_info_1:
+            pharma = fetch_config('pharmacy_info') or "Información de farmacias no disponible."
+            st.caption("💊 Farmacias de Turno (Hoy)")
+            st.info(f"**{pharma}**")
+        
+        with c_info_2:
+            emergency = fetch_config('emergency_info') or "Información de emergencia no disponible."
+            st.caption("🚨 Teléfonos de Emergencia")
+            st.error(f"**{emergency}**")
             
-            # 1. Real "This Month" Count
-            # Use UTC now to match dataframe column
-            start_month = pd.Timestamp.now(tz='UTC').replace(day=1, hour=0, minute=0, second=0, microsecond=0)
-            month_count = len(df[df['created_at'] >= start_month])
-            
-            # 2. Real Efficiency
-            resolved_df = df[df['status'].isin(['Resuelto', 'Cerrado'])]
-            resolved_count = len(resolved_df)
-            efficiency = int((resolved_count / len(df)) * 100) if len(df) > 0 else 0
-            
-            # 3. Real Avg Time (Approximation using updated_at if exists, else diff from now)
-            # If we don't have closed_at, we use updated_at for resolved tickets
-            avg_days_str = "N/A"
-            if 'updated_at' in df.columns and not resolved_df.empty:
-                # Convert updated_at
-                resolved_df['updated_at'] = pd.to_datetime(resolved_df['updated_at'])
-                # Calc diff
-                deltas = resolved_df['updated_at'] - resolved_df['created_at']
-                avg_days = deltas.mean().days
-                avg_days_str = f"{avg_days} Días"
-            elif not resolved_df.empty:
-                 # Fallback if no updated_at: just show "En cálculo"
-                 avg_days_str = "Variado"
-
-            st.markdown("##### Transparencia Municipal")
-            k1, k2, k3 = st.columns(3)
-            with k1:
-                st.metric("Solicitudes Este Mes", month_count, delta="Mes Actual")
-            with k2:
-                st.metric("Casos Resueltos", resolved_count, delta=f"{efficiency}% Eficiencia")
-            with k3:
-                st.metric("Tiempo Promedio", avg_days_str, help="Promedio días (Creación -> Cierre)")
-            
-            st.divider()
-            
-            # --- CHARTS ROW ---
-            c_trend, c_cat = st.columns([1, 1])
-            
-            with c_trend:
-                st.markdown("**📅 Evolución de Solicitudes**")
-                # Group by date
-                daily_counts = df.groupby(df['created_at'].dt.date).size().reset_index(name='Cantidad')
-                daily_counts.columns = ['Fecha', 'Cantidad']
-                
-                fig_trend = px.bar(daily_counts, x='Fecha', y='Cantidad', height=250)
-                # Spanish formatting: Use numeric dates DD/MM to avoid 'Jan/Feb'
-                fig_trend.update_xaxes(tickformat="%d/%m")
-                fig_trend.update_traces(hovertemplate="<b>Fecha</b>: %{x|%d-%m-%Y}<br><b>Solicitudes</b>: %{y}<extra></extra>")
-                fig_trend.update_layout(margin=dict(t=10, b=10, l=10, r=10), xaxis_title="Fecha", yaxis_title="N° Solicitudes")
-                st.plotly_chart(fig_trend, use_container_width=True)
-
-            with c_cat:
-                st.markdown("**🏷️ Temas más consultados**")
-                if 'category' in df.columns:
-                    cat_counts = df['category'].value_counts().reset_index()
-                    cat_counts.columns = ['Tema', 'Cantidad']
-                    
-                    if not cat_counts.empty:
-                        fig_pie = px.pie(cat_counts, values='Cantidad', names='Tema', hole=0.4, height=250)
-                        fig_pie.update_traces(hovertemplate="<b>%{label}</b><br>Cantidad: %{value}<br>Porcentaje: %{percent}<extra></extra>")
-                        fig_pie.update_layout(showlegend=True, margin=dict(t=10, b=10, l=0, r=0), legend=dict(orientation="h", y=-0.2))
-                        st.plotly_chart(fig_pie, use_container_width=True)
-                    else:
-                        st.info("Sin datos de categorías.")
-                else:
-                    st.error("⚠️ Datos de categoría no disponibles.")
-            
-            st.divider()
-            
-            c_info_1, c_info_2 = st.columns(2)
-            
-            with c_info_1:
-                from modules.db import fetch_config
-                pharma = fetch_config('pharmacy_info') or "Información de farmacias no disponible."
-                st.caption("Farmacias de Turno (Hoy)")
-                st.success(pharma)
-            
-            with c_info_2:
-                emergency = fetch_config('emergency_info') or "Información de emergencia no disponible."
-                st.caption("Teléfonos de Emergencia")
-                st.warning(emergency)
-                
-        else:
-             st.info("No hay datos estadísticos disponibles aún.")
+        st.divider()
+        
+        # 3. Contact Footer
+        st.markdown("##### 📞 Contacto Municipal")
+        st.markdown("""
+        - **Mesa Central:** +56 45 2 123 456
+        - **Dirección:** Av. Balmaceda 123, Cholchol
+        - **Horario de Atención:** Lunes a Viernes, 08:30 - 14:00 hrs.
+        """)
