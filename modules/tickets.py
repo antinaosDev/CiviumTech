@@ -187,6 +187,7 @@ def render_ticket_list(tickets, filter_category, search_query):
         # Unit Info
         unit_info = UNIDADES.get(t_depto_code, {})
         unit_label = unit_info.get('label', t_depto_code)
+        unit_icon = unit_info.get('icon', 'folder')
         # Icon Mapping for Departments
         ICON_TO_EMOJI = {
             'crown': '👑',
