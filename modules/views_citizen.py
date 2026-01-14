@@ -325,11 +325,11 @@ def render_citizen_view():
                 st.markdown("**1. Crea una Solicitud**")
                 st.info("Ingresa a la pestaña **'Ingresar Solicitud'**, completa tus datos y describe tu problema. ¡Puedes ubicarlo en el mapa!")
             with c_step2:
-                st.markdown("**2. Guarda tu Código**")
-                st.warning("Al enviar, recibirás un código único (ej: `REQ-123`). **Guárdalo**, es tu llave para consultar el avance.")
+                st.markdown("**2. Descarga tu Comprobante**")
+                st.warning("Al finalizar, podrás **descargar un PDF** con los detalles y tu número de seguimiento. ¡Guárdalo!")
             with c_step3:
                 st.markdown("**3. Revisa el Estado**")
-                st.success("Ve a **'Consultar Estado'**, ingresa tu código y verás la respuesta oficial del municipio.")
+                st.success("Ve a **'Consultar Estado'**, ingresa el ID del comprobante y verás la respuesta oficial.")
         
         st.divider()
         
@@ -349,13 +349,3 @@ def render_citizen_view():
             emergency = fetch_config('emergency_info') or "Información de emergencia no disponible."
             st.caption("🚨 Teléfonos de Emergencia")
             st.error(f"**{emergency}**")
-            
-        st.divider()
-        
-        # 3. Contact Footer
-        st.markdown("##### 📞 Contacto Municipal")
-        st.markdown("""
-        - **Mesa Central:** +56 45 2 123 456
-        - **Dirección:** Av. Balmaceda 123, Cholchol
-        - **Horario de Atención:** Lunes a Viernes, 08:30 - 14:00 hrs.
-        """)
