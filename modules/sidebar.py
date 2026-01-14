@@ -107,6 +107,12 @@ def render_custom_sidebar(current_role):
                                 st.session_state['filter'] = u_code
                                 st.rerun()
 
+        # Content Manager (Admin & Programador)
+        if current_role in ['Programador', 'Administrador'] and 'simulated_role' not in st.session_state:
+             st.divider()
+             if st.button("⚙️ Gestor de Contenidos", use_container_width=True):
+                 st.session_state['view_mode'] = 'content_manager'
+
         # Admin Menu (Programador Only - Hidden during simulation)
         if get_real_role() == 'Programador' and 'simulated_role' not in st.session_state:
             st.divider()
@@ -116,12 +122,6 @@ def render_custom_sidebar(current_role):
                 
                 if st.button("📝 Base de Conocimiento", help="Wiki Interna"):
                     st.session_state['view_mode'] = 'wiki' # Placeholder if needed, or remove.
-                    
-        # Content Manager (Admin & Programador)
-        if current_role in ['Programador', 'Administrador'] and 'simulated_role' not in st.session_state:
-             st.divider()
-             if st.button("⚙️ Gestor de Contenidos", use_container_width=True):
-                 st.session_state['view_mode'] = 'content_manager'
                 
                 # Simulation Controls
                 st.markdown("Simular Rol:")
