@@ -382,7 +382,10 @@ def render_citizen_view():
                 daily_counts.columns = ['Fecha', 'Cantidad']
                 
                 fig_trend = px.bar(daily_counts, x='Fecha', y='Cantidad', height=250)
-                fig_trend.update_layout(margin=dict(t=10, b=10, l=10, r=10))
+                # Spanish formatting: Use numeric dates DD/MM to avoid 'Jan/Feb'
+                fig_trend.update_xaxes(tickformat="%d/%m")
+                fig_trend.update_traces(hovertemplate="<b>Fecha</b>: %{x|%d-%m-%Y}<br><b>Solicitudes</b>: %{y}<extra></extra>")
+                fig_trend.update_layout(margin=dict(t=10, b=10, l=10, r=10), xaxis_title="Fecha", yaxis_title="N° Solicitudes")
                 st.plotly_chart(fig_trend, use_container_width=True)
 
             with c_cat:
@@ -393,6 +396,7 @@ def render_citizen_view():
                     
                     if not cat_counts.empty:
                         fig_pie = px.pie(cat_counts, values='Cantidad', names='Tema', hole=0.4, height=250)
+                        fig_pie.update_traces(hovertemplate="<b>%{label}</b><br>Cantidad: %{value}<br>Porcentaje: %{percent}<extra></extra>")
                         fig_pie.update_layout(showlegend=True, margin=dict(t=10, b=10, l=0, r=0), legend=dict(orientation="h", y=-0.2))
                         st.plotly_chart(fig_pie, use_container_width=True)
                     else:
