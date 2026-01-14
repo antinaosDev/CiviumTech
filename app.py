@@ -73,6 +73,11 @@ def main():
             elif current_view == 'assets':
                 from modules.assets_view import render_assets_view
                 render_assets_view()
+
+            # --- WIKI VIEW ---
+            elif current_view == 'wiki':
+                from modules.views_wiki import render_wiki_view
+                render_wiki_view()
                 
             # --- TICKET LIST / DASHBOARD ---
             elif current_view in ['overview', 'list', 'tickets']:
