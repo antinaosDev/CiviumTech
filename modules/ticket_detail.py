@@ -52,7 +52,7 @@ def render_ticket_detail(ticket):
             st.divider()
             
             st.caption("ASUNTO")
-            st.markdown(f"##### {ticket.get('subject', ticket.get('sub', 'Sin Asunto'))}")
+            st.markdown(f"##### {ticket.get('subject', 'Sin Asunto')}")
             
             st.caption("DETALLE DEL PROBLEMA")
             st.info(ticket.get('description', ticket.get('desc')))

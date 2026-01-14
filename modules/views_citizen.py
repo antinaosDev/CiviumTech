@@ -69,7 +69,7 @@ def render_citizen_view():
                 #     # Check if we already sent it to avoid resending on refresh
                 #     if 'receipt_sent' not in st.session_state or st.session_state.receipt_sent != st.session_state.success_ticket_id:
                 #         email_subject = f"Comprobante de Solicitud #{st.session_state.success_ticket_id} - CiviumTech"
-                #         email_body = f"""Estimado(a) Vecino(a),\n\nHemos recibido su solicitud con éxito.\n\nID: {st.session_state.success_ticket_id}\nAsunto: {ticket_data.get('sub')}\n\nAdjuntamos el comprobante oficial en PDF.\n\nAtte,\nMunicipalidad de Cholchol"""
+                #         email_body = f"""Estimado(a) Vecino(a),\n\nHemos recibido su solicitud con éxito.\n\nID: {st.session_state.success_ticket_id}\nAsunto: {ticket_data.get('subject')}\n\nAdjuntamos el comprobante oficial en PDF.\n\nAtte,\nMunicipalidad de Cholchol"""
                 #         
                 #         def send_async():
                 #             send_simple_email(ticket_data['user_email'], email_subject, email_body, pdf_bytes, f"Comprobante_{st.session_state.success_ticket_id}.pdf")
@@ -227,7 +227,7 @@ def render_citizen_view():
                                 'user_email': backend_email, 
                                 'citizen_name': ciudadano_str,
                                 'category': selected_cat,
-                                'sub': subject,
+                                'subject': subject,
                                 'description': full_desc,
                                 'status': 'Pendiente',
                                 'depto': unit_code,
@@ -279,7 +279,7 @@ def render_citizen_view():
 <div style="background: white; border: 1px solid #e2e8f0; border-radius: 12px; padding: 2rem;">
 <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem;">
 <div>
-<h2 style="margin: 0; color: #1e293b;">{ticket.get('sub', 'Sin Asunto')}</h2>
+<h2 style="margin: 0; color: #1e293b;">{ticket.get('subject', 'Sin Asunto')}</h2>
 <div style="color: #64748b; font-size: 0.9rem; margin-top: 4px;">ID: <strong>{ticket.get('id')}</strong> • {ticket.get('fecha')}</div>
 </div>
 <div>{status_badge}</div>
