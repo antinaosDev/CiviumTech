@@ -147,6 +147,25 @@ def render_field_ops_card_grid():
     st.markdown('<div class="responsive-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem;">', unsafe_allow_html=True)
     
     color_map = { 'Salud': 'bg-teal-50 text-teal-700', 'Veterinario': 'bg-amber-50 text-amber-700', 'Social': 'bg-pink-50 text-pink-700', 'Servicios': 'bg-blue-50 text-blue-700' }
+    
+    # Emoji Mapping for Robustness
+    ICON_MAP = {
+        'medical_services': '🏥',
+        'event': '📅',
+        'place': '📍',
+        'local_shipping': '🚛',
+        'pets': '🐾',
+        'favorite': '❤️',
+        'security': '🛡️',
+        'school': '🎓',
+        'engineering': '👷',
+        'forest': '🌲',
+        'grass': '🌾',
+        'work': '💼',
+        'water_drop': '💧',
+        'computer': '💻',
+        'build': '🛠️'
+    }
 
     activities = fetch_activities()
     
@@ -157,22 +176,23 @@ def render_field_ops_card_grid():
         # DB fields: title, type, date_str, time_str, location, icon
         # Map DB fields to UI expectation
         tipo = evt.get('type', 'General')
-        icon = evt.get('icon', 'event')
+        raw_icon = evt.get('icon', 'event')
+        display_icon = ICON_MAP.get(raw_icon, '📅') # Fallback to calendar if unknown
         
         style_class = color_map.get(tipo, 'bg-gray-50 text-gray-700')
         
         card_html = f"""
         <div style="background: white; border: 1px solid #e2e8f0; border-radius: 12px; padding: 1.5rem; display: flex; flex-direction: column; gap: 0.5rem;">
             <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.5rem;">
-                <span class="material-icons-round" style="color: #64748b;">{icon}</span>
+                <span style="font-size: 24px;">{display_icon}</span>
                 <span style="font-size: 0.7rem; font-weight: 700; padding: 2px 8px; border-radius: 99px; background: #f1f5f9; color: #475569;">{tipo}</span>
             </div>
             <h4 style="margin: 0; font-size: 1rem; color: #1e293b;">{evt['title']}</h4>
             <div style="font-size: 0.8rem; color: #64748b; display: flex; align-items: center; gap: 4px;">
-                <span class="material-icons-round" style="font-size: 14px;">event</span> {evt['date_str']} {evt['time_str']}
+                <span>📅</span> {evt['date_str']} {evt['time_str']}
             </div>
             <div style="font-size: 0.8rem; color: #64748b; display: flex; align-items: center; gap: 4px;">
-                <span class="material-icons-round" style="font-size: 14px;">place</span> {evt['location']}
+                <span>📍</span> {evt['location']}
             </div>
         </div>
         """
