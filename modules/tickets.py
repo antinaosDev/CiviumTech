@@ -187,8 +187,52 @@ def render_ticket_list(tickets, filter_category, search_query):
         # Unit Info
         unit_info = UNIDADES.get(t_depto_code, {})
         unit_label = unit_info.get('label', t_depto_code)
-        unit_icon = unit_info.get('icon', 'folder')
-        unit_bg = unit_info.get('hex_bg', '#f1f5f9')
+        # Icon Mapping for Departments
+        ICON_TO_EMOJI = {
+            'crown': '👑',
+            'groups': '👥',
+            'business': '🏢',
+            'balance': '⚖️',
+            'diversity_3': '🤝',
+            'computer': '💻',
+            'gavel': '🔨',
+            'fact_check': '📋',
+            'favorite': '❤️',
+            'volunteer_activism': '🤲',
+            'elderly': '👴',
+            'home': '🏠',
+            'spa': '🌱',
+            'handshake': '🤝',
+            'layers': '📚',
+            'child_care': '🧸',
+            'woman': '👩',
+            'shield': '🛡️',
+            'recycling': '♻️',
+            'engineering': '👷',
+            'local_shipping': '🚛',
+            'calculate': '🧮',
+            'bar_chart': '📊',
+            'store': '🏪',
+            'shopping_cart': '🛒',
+            'inventory_2': '📦',
+            'description': '📄',
+            'inventory': '🗄️',
+            'track_changes': '🎯',
+            'trending_up': '📈',
+            'radio': '📻',
+            'search': '🔍',
+            'work': '💼',
+            'grass': '🌾',
+            'forest': '🌲',
+            'map': '🗺️',
+            'local_hospital': '🏥',
+            'school': '🎓',
+            'sports_soccer': '⚽',
+            'music_note': '🎵',
+            'security': '👮'
+        }
+        
+        unit_emoji = ICON_TO_EMOJI.get(unit_icon, '🏢')
 
         # Card Layout
         with st.container():
@@ -204,7 +248,7 @@ def render_ticket_list(tickets, filter_category, search_query):
                             <span style="font-size: 0.75rem; color: #94a3b8;">📅 {t_date}</span>
                         </div>
                         <div style="display: flex; align-items: center; gap: 0.5rem;">
-                            <span class="material-icons-round" style="font-size: 14px; color: {unit_bg.replace('40','').replace('#','')}">{unit_icon}</span> 
+                            <span style="font-size: 16px;">{unit_emoji}</span> 
                             <span style="font-size: 0.75rem; font-weight: 600; color: #475569;">{unit_label}</span>
                         </div>
                     </div>
@@ -216,7 +260,7 @@ def render_ticket_list(tickets, filter_category, search_query):
                             {render_urgency_badge(t_urgency)}
                         </div>
                         <div style="margin-left: auto; display: flex; align-items: center; gap: 4px;">
-                            <span class="material-icons-round" style="font-size: 14px;">person</span> {t_citizen}
+                            <span style="font-size: 16px;">👤</span> {t_citizen}
                         </div>
                     </div>
                 </div>
