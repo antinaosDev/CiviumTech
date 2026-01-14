@@ -227,7 +227,7 @@ def render_citizen_view():
                                 'user_email': backend_email, 
                                 'citizen_name': ciudadano_str,
                                 'category': selected_cat,
-                                'subject': subject,
+                                'sub': subject,
                                 'description': full_desc,
                                 'status': 'Pendiente',
                                 'depto': unit_code,
