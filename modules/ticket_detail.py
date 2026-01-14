@@ -126,8 +126,8 @@ def render_ticket_detail(ticket):
                                 'urgency': new_urgency,
                                 'reply': reply_text
                             })
-                            st.success("¡Ticket actualizado!")
-                            time.sleep(1)
+                            st.toast("¡Ticket actualizado exitosamente!", icon="✅")
+                            time.sleep(1.5)
                             st.session_state.selected_ticket_id = None
                             st.rerun()
                         except Exception as e:
@@ -139,8 +139,8 @@ def render_ticket_detail(ticket):
             if st.button("🗑️ Eliminar Solicitud", type="primary", help="Esta acción no se puede deshacer."):
                 from modules.db import delete_ticket
                 if delete_ticket(ticket.get('id')):
-                    st.success("Solicitud eliminada.")
-                    time.sleep(1)
+                    st.toast("Solicitud eliminada correctamente.", icon="✅")
+                    time.sleep(1.5)
                     st.session_state.selected_ticket_id = None
                     st.rerun()
                 else:

@@ -71,7 +71,9 @@ def render_admin_users():
                                 
                             try:
                                 db.update_user_record(user_id, updates)
-                                st.success("Usuario actualizado.")
+                                st.toast("Usuario actualizado correctamente.", icon="✅")
+                                import time
+                                time.sleep(1.5)
                                 st.rerun()
                             except Exception as e:
                                 st.error(f"Error al actualizar: {e}")
@@ -82,7 +84,9 @@ def render_admin_users():
                         if st.button("🗑️ Eliminar Usuario", type="primary"):
                             try:
                                 db.delete_user_record(user_id)
-                                st.warning("Usuario eliminado.")
+                                st.toast("Usuario eliminado.", icon="🗑️")
+                                import time
+                                time.sleep(1.5)
                                 st.rerun()
                             except Exception as e:
                                 st.error(f"Error al eliminar: {e}")
@@ -126,6 +130,6 @@ def render_admin_users():
                     }
                     try:
                         db.create_user_record(data)
-                        st.success(f"Usuario {new_user} creado exitosamente.")
+                        st.toast(f"Usuario {new_user} creado exitosamente.", icon="✅")
                     except Exception as e:
                         st.error(f"Error al crear: {e}")

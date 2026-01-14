@@ -43,7 +43,10 @@ def render_assets_view():
                     }
                     res = create_asset(new_asset)
                     if res:
-                        st.success("Activo creado exitosamente.")
+                        st.toast("Activo creado exitosamente.", icon="✅")
+                        # Add sleep to ensure toast visibility before rerun
+                        import time
+                        time.sleep(1.5)
                         st.rerun()
 
     st.divider()
@@ -131,12 +134,16 @@ def render_assets_view():
                         }
                         ures = update_asset(asset_id, updates)
                         if ures:
-                            st.success("Activo actualizado corrextamente.")
+                            st.toast("Activo actualizado correctamente.", icon="✅")
+                            import time
+                            time.sleep(1.5)
                             st.rerun()
 
                 # Delete Button (Outside Form for safety)
                 st.markdown("---")
                 if st.button("❌ Eliminar este Activo", type="primary"):
                     if delete_asset(asset_id):
-                        st.warning("Activo eliminado.")
+                        st.toast("Activo eliminado.", icon="🗑️")
+                        import time
+                        time.sleep(1.5)
                         st.rerun()

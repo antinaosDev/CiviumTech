@@ -85,8 +85,30 @@ def render_custom_sidebar(current_role):
                  visible_groups = ['Servicios a la Comunidad']
                 
             for group_name in visible_groups:
-                # Find units in this group
-                group_units = {k: v for k, v in UNIDADES.items() if v.get('group') == group_name}
+                # Find all units in this group first
+                group_units_all = {k: v for k, v in UNIDADES.items() if v.get('group') == group_name}
+                
+                # Strict Filtering Logic
+                group_units = {}
+                if current_role in ['Programador', 'Administrador']:
+                     # Show Everything
+                     group_units = group_units_all
+                else:
+                    # Specific Filtering
+                    # 1. Define Mapping for generic roles to specific unit codes
+                    role_map = {
+                        'DIDECO': 'DIDECO_DIR',
+                        'DOM': 'DOM_DIR',
+                        'DAF': 'DAF_DIR' 
+                    }
+                    
+                    # 2. Determine target unit code
+                    # If role is in map, use mapped value, otherwise use role itself
+                    target_unit = role_map.get(current_role, current_role)
+                    
+                    # 3. Filter
+                    if target_unit in group_units_all:
+                        group_units = {target_unit: group_units_all[target_unit]}
                 
                 if group_units:
                     # Decide icon based on group header (Static mapping for visual flair)

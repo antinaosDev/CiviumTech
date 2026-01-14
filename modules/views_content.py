@@ -41,9 +41,11 @@ def render_content_manager():
                         # Delete Button
                         if st.button("🗑️ Eliminar", key=f"del_{act['id']}", type="primary"):
                             delete_activity(act['id'])
-                            st.toast("Actividad eliminada")
+                            st.toast("Actividad eliminada.", icon="🗑️")
                             if st.session_state.edit_activity_id == act['id']:
                                 st.session_state.edit_activity_id = None
+                            import time
+                            time.sleep(1.5)
                             st.rerun()
         else:
             st.info("No hay actividades registradas.")
@@ -129,7 +131,9 @@ def render_content_manager():
                     else:
                         create_activity(new_data)
                         st.toast("Actividad creada correctamente.", icon="✅")
-                        
+                    
+                    import time
+                    time.sleep(1.5)
                     st.rerun()
 
     # --- TAB 2: INFO DATA ---
@@ -152,5 +156,7 @@ def render_content_manager():
                 update_config("pharmacy_info", pharma_text)
                 update_config("emergency_info", emergency_text)
                 st.toast("Información actualizada correctamente.", icon="✅")
+                import time
+                time.sleep(1.5)
                 # Optional: rerun to refresh if needed, but toast is nice
                 st.rerun()
