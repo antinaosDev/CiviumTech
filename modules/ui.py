@@ -113,7 +113,7 @@ def render_status_badge(status):
 
 def render_urgency_badge(urgency):
     if urgency in ['Alta', 'Crítica']:
-        return f'<span style="color: #dc2626; font-weight: 700; font-size: 0.75rem; display: flex; align-items: center; gap: 4px;"><span class="material-icons-round" style="font-size: 14px;">local_fire_department</span> {urgency}</span>'
+        return f'<span style="color: #dc2626; font-weight: 700; font-size: 0.75rem; display: flex; align-items: center; gap: 4px;">🔥 {urgency}</span>'
     return f'<span style="color: #64748b; font-size: 0.75rem;">{urgency}</span>'
 
 def display_footer():

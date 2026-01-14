@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 from datetime import datetime
 from modules.db import (
-    fetch_activities, create_activity, delete_activity,
+    fetch_activities, create_activity, delete_activity, update_activity,
     fetch_config, update_config
 )
 
@@ -16,45 +16,100 @@ def render_content_manager():
     with tab_activities:
         st.subheader("Actividades Programadas")
         
-        # 1. List Existing
-        activities = fetch_activities()
-        if activities:
-            df = pd.DataFrame(activities)
-            # Display simpler table
-            st.dataframe(
-                df[['id', 'date_str', 'time_str', 'type', 'title', 'location']],
-                use_container_width=True,
-                hide_index=True
-            )
+        # 1. Initialize Session State for Editing
+        if 'edit_activity_id' not in st.session_state:
+            st.session_state.edit_activity_id = None
             
-            # Delete Action
-            st.markdown("##### Eliminar Actividad")
-            with st.form("delete_activity_form"):
-                id_to_del = st.selectbox("Seleccione ID a eliminar", [a['id'] for a in activities])
-                if st.form_submit_button("🗑️ Eliminar", type="primary"):
-                    delete_activity(id_to_del)
-                    st.success("Actividad eliminada.")
-                    st.rerun()
+        activities = fetch_activities()
+        
+        # 2. List & Actions
+        if activities:
+            # Create a more interactive list
+            for act in activities:
+                with st.expander(f"{act['date_str']} - {act['title']} ({act['type']})", expanded=False):
+                    c1, c2 = st.columns([3, 1])
+                    with c1:
+                        st.markdown(f"**Lugar:** {act['location']}")
+                        st.markdown(f"**Hora:** {act['time_str']}")
+                        st.markdown(f"**ID:** {act['id']}")
+                    with c2:
+                        # Edit Button
+                        if st.button("✏️ Editar", key=f"edit_{act['id']}"):
+                            st.session_state.edit_activity_id = act['id']
+                            st.rerun()
+                        
+                        # Delete Button
+                        if st.button("🗑️ Eliminar", key=f"del_{act['id']}", type="primary"):
+                            delete_activity(act['id'])
+                            st.toast("Actividad eliminada")
+                            if st.session_state.edit_activity_id == act['id']:
+                                st.session_state.edit_activity_id = None
+                            st.rerun()
         else:
             st.info("No hay actividades registradas.")
-            
+
         st.divider()
+
+        # 3. Form (Create or Update)
         
-        # 2. Add New
-        st.subheader("➕ Agregar Nueva Actividad")
-        with st.form("new_activity_form"):
+        # Determine Mode
+        is_edit_mode = st.session_state.edit_activity_id is not None
+        form_title = "✏️ Editar Actividad" if is_edit_mode else "➕ Agregar Nueva Actividad"
+        
+        # Default Values
+        default_title = ""
+        default_type = "Salud"
+        default_date = datetime.now()
+        default_time = datetime.now().time()
+        default_loc = ""
+        
+        # If Edit Mode, find the activity
+        if is_edit_mode:
+            target_act = next((a for a in activities if a['id'] == st.session_state.edit_activity_id), None)
+            if target_act:
+                default_title = target_act['title']
+                default_type = target_act['type']
+                try:
+                    default_date = datetime.strptime(target_act['date_str'], "%Y-%m-%d").date()
+                    default_time = datetime.strptime(target_act['time_str'], "%H:%M").time()
+                except: pass
+                default_loc = target_act['location']
+                
+                st.warning(f"Editando: {default_title}")
+                if st.button("Cancelar Edición"):
+                    st.session_state.edit_activity_id = None
+                    st.rerun()
+            else:
+                # ID not found (deleted?)
+                st.session_state.edit_activity_id = None
+                st.rerun()
+
+        st.subheader(form_title)
+        
+        with st.form("activity_form"):
             col1, col2 = st.columns(2)
             with col1:
-                title = st.text_input("Título", placeholder="Ej. Operativo Veterinario")
-                type_ = st.selectbox("Tipo", ["Salud", "Veterinario", "Social", "Servicios"])
+                title = st.text_input("Título", value=default_title, placeholder="Ej. Operativo Veterinario")
+                
+                # Type Index handling
+                type_options = ["Salud", "Veterinario", "Social", "Servicios"]
+                try:
+                    type_idx = type_options.index(default_type)
+                except:
+                    type_idx = 0
+                    
+                type_ = st.selectbox("Tipo", type_options, index=type_idx)
+                
                 icon_map = {"Salud": "medical_services", "Veterinario": "pets", "Social": "favorite", "Servicios": "local_shipping"}
                 
             with col2:
-                date_obj = st.date_input("Fecha")
-                time_obj = st.time_input("Hora")
-                location = st.text_input("Lugar", placeholder="Ej. Sede Social Malalche")
+                date_obj = st.date_input("Fecha", value=default_date)
+                time_obj = st.time_input("Hora", value=default_time)
+                location = st.text_input("Lugar", value=default_loc, placeholder="Ej. Sede Social Malalche")
                 
-            if st.form_submit_button("Guardar Actividad"):
+            submit_label = "💾 Actualizar Actividad" if is_edit_mode else "🚀 Guardar Actividad"
+            
+            if st.form_submit_button(submit_label):
                 if not title or not location:
                     st.error("Título y Lugar son obligatorios.")
                 else:
@@ -66,8 +121,15 @@ def render_content_manager():
                         "location": location,
                         "icon": icon_map.get(type_, "event")
                     }
-                    create_activity(new_data)
-                    st.success("Actividad creada correctamente.")
+                    
+                    if is_edit_mode:
+                        update_activity(st.session_state.edit_activity_id, new_data)
+                        st.toast("Actividad actualizada correctamente.", icon="✅")
+                        st.session_state.edit_activity_id = None # Exit edit mode
+                    else:
+                        create_activity(new_data)
+                        st.toast("Actividad creada correctamente.", icon="✅")
+                        
                     st.rerun()
 
     # --- TAB 2: INFO DATA ---

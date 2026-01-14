@@ -232,6 +232,11 @@ def delete_activity(activity_id):
     client = get_supabase()
     return client.table("activities").delete().eq("id", activity_id).execute()
 
+def update_activity(activity_id, updates):
+    """Update an activity."""
+    client = get_supabase()
+    return client.table("activities").update(updates).eq("id", activity_id).execute()
+
 # 2. Site Config (Pharmacies, Emergency)
 @retry_db
 def fetch_config(key):
