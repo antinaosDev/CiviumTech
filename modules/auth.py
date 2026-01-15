@@ -30,7 +30,7 @@ def login_user(username, password):
                 st.session_state['full_name'] = user_row['full_name']
                 st.session_state['user_id'] = user_row['id']
                 st.session_state['email'] = user_row.get('email', '')
-                st.session_state['department'] = user_row.get('department', '')
+                st.session_state['department'] = user_row.get('department_id', '')
                 return True
         except Exception as e:
             print(f"Login error: {e}")
@@ -172,7 +172,7 @@ def render_login():
                 with st.form("login_form_func", border=False):
                     st.markdown("##### 🔐 Acceso Corporativo")
                     st.caption("Ingrese sus credenciales municipales")
-                    username = st.text_input("Usuario", placeholder="ej. 12.345.678-9", key="user_func")
+                    username = st.text_input("Usuario", placeholder="ej. user1", key="user_func")
                     password = st.text_input("Contraseña", type="password", placeholder="••••••••", key="pass_func")
                     
                     st.markdown("<div style='height: 1rem;'></div>", unsafe_allow_html=True)

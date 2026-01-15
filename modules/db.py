@@ -95,6 +95,17 @@ def delete_user_record(user_id):
     client = get_supabase()
     return client.table("users").delete().eq("id", user_id).execute()
 
+@retry_db
+def fetch_departments():
+    """Fetch all departments for selection."""
+    client = get_supabase()
+    try:
+        res = client.table("departments").select("id, name, code").order("name").execute()
+        return res.data if res.data else []
+    except Exception as e:
+        print(f"Error fetching departments: {e}")
+        return []
+
 # --- TICKETS CRUD ---
 
 @retry_db
