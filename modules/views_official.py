@@ -163,12 +163,14 @@ def render_official_view(tickets_data, current_filter):
                                 'category': 'Interna', 
                                 'priority': priority.upper(),
                                 'status': 'RECIBIDO',
-                                # 'user_id': st.session_state.get('user_id'), # REMOVED: Column missing in live DB
-                                'user_email': st.session_state.get('email'), # Creator Email (For filtering)
-                                'assigned_department_id': selected_dept['id'],
-                                'depto': selected_dept['code'] # REQUIRED for compatibility with UI
+                                'depto': selected_dept['code'] 
+                                # OMITTING: user_id, assigned_department_id, user_email due to Schema Mismatch on Live DB
                             }
                             
+                            # Add Email to description as metadata workaround
+                            if st.session_state.get('email'):
+                                new_ticket['description'] += f"\n\n[Enviado por: {st.session_state.get('email')}]"
+
                             from modules.db import create_ticket
                             try:
                                 create_ticket(new_ticket)
@@ -180,12 +182,17 @@ def render_official_view(tickets_data, current_filter):
 
             with c2:
                 st.write("###### Mis Solicitudes Enviadas")
-                # Fetch tickets created by me
-                # FIX: Use 'user_email' instead of 'user_id' as 'user_id' column might be missing/unreliable in filters
-                # API Error showed 'column tickets.user_id does not exist' -> So we rely on user_email
+                # Fetches ALL tickets and filters in Python (Safe Fallback)
+                # This avoids crashing if DB columns for filtering are missing
                 my_email = st.session_state.get('email')
                 if my_email:
-                     sent_tickets = fetch_tickets(filters={'user_email': my_email})
+                     all_tickets = fetch_tickets(limit=100)
+                     # Filter manually: check description or user_email if it existed (but we just removed it from payload? No, we likely want it if it exists)
+                     # Since we added it to description, we can search description? Or hope user_email exists?
+                     # Better: search description for "[Enviado por: {my_email}]"
+                     
+                     sent_tickets = [t for t in all_tickets if my_email in t.get('description', '') or t.get('user_email') == my_email]
+                     
                      if sent_tickets:
                          for t in sent_tickets[:5]: # Show last 5
                              with st.expander(f"{t.get('created_at', '')[:10]} - {t.get('title', 'Sin título')}"):
