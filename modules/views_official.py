@@ -147,7 +147,7 @@ def render_official_view(tickets_data, current_filter):
                     
                     target_dept_name = st.selectbox("Unidad de Destino", options=list(dept_map.keys()))
                     
-                    priority = st.select_slider("Prioridad", options=["Baja", "Media", "Alta", "Urgente"], value="Media")
+                    priority = st.select_slider("Prioridad", options=["Baja", "Media", "Alta", "Crítica"], value="Media")
                     desc = st.text_area("Descripción de la Solicitud")
                     
                     submitted = st.form_submit_button("Enviar Solicitud", type="primary")
