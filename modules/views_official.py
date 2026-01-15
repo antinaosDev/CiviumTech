@@ -194,7 +194,10 @@ def render_official_view(tickets_data, current_filter):
                 
                 # Fetches ALL tickets and filters in Python (Safe Fallback)
                 my_email = st.session_state.get('email')
-                current_role = st.session_state.get('user_role', '')
+                
+                # FIX: Use get_current_role to respect Simulation Mode
+                from modules.auth import get_current_role
+                current_role = get_current_role()
                 
                 if my_email or current_role:
                      all_tickets = fetch_tickets(limit=100)
@@ -210,8 +213,8 @@ def render_official_view(tickets_data, current_filter):
                      for t in all_tickets:
                          c_name = t.get('citizen_name') or ''
                          
-                         # Check strict role match
-                         if current_role and target_signature in c_name:
+                         # Check strict role match (Exact Match preferred for safety)
+                         if current_role and c_name == target_signature:
                              sent_tickets.append(t)
                          
                          # Note: Legacy tickets (without signature) are excluded prevents ambiguity.
