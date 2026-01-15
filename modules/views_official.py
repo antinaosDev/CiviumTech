@@ -1,4 +1,5 @@
 import streamlit as st
+import time
 from modules.db import fetch_tickets, fetch_ticket_by_id
 from modules.tickets import render_ticket_list
 from modules.ticket_detail import render_ticket_detail
