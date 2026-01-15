@@ -69,7 +69,7 @@ UNIDADES = {
   'TRANSPARENCIA': {'label': 'Transparencia', 'group': 'Gestión Interna', 'color': 'bg-cyan-50 text-cyan-900', 'icon': 'search', 'hex_bg': '#f0f9ff', 'hex_text': '#0c4a6e'},
 
   # FOMENTO PRODUCTIVO
-  'UDEL': {'label': 'UDEL (Emprendimiento)', 'group': 'Fomento Productivo', 'color': 'bg-amber-500 text-white', 'icon': 'work', 'hex_bg': '#f59e0b', 'hex_text': '#ffffff'},
+  'UDEL': {'label': 'UDEL', 'group': 'Fomento Productivo', 'color': 'bg-amber-500 text-white', 'icon': 'work', 'hex_bg': '#f59e0b', 'hex_text': '#ffffff'},
   'PRODESAL': {'label': 'PRODESAL', 'group': 'Fomento Productivo', 'color': 'bg-amber-100 text-amber-800', 'icon': 'grass', 'hex_bg': '#fef3c7', 'hex_text': '#92400e'},
   'PDTI': {'label': 'PDTI (Territorial)', 'group': 'Fomento Productivo', 'color': 'bg-amber-200 text-amber-900', 'icon': 'forest', 'hex_bg': '#fde68a', 'hex_text': '#78350f'},
   'SERVICIO_PAIS': {'label': 'Servicio País', 'group': 'Fomento Productivo', 'color': 'bg-teal-100 text-teal-800', 'icon': 'map', 'hex_bg': '#ccfbf1', 'hex_text': '#115e59'},
