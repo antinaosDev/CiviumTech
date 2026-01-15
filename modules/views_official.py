@@ -1,9 +1,11 @@
 import streamlit as st
 import time
-from modules.db import fetch_tickets, fetch_ticket_by_id
+from modules.db import fetch_tickets, fetch_ticket_by_id, delete_ticket, update_ticket
 from modules.tickets import render_ticket_list
 from modules.ticket_detail import render_ticket_detail
 from modules.ui import render_field_ops_card_grid
+
+
 
 def render_official_view(tickets_data, current_filter):
     # Determine Label for Title
@@ -183,21 +185,65 @@ def render_official_view(tickets_data, current_filter):
 
             with c2:
                 st.write("###### Mis Solicitudes Enviadas")
+                st.caption("Gestione las solicitudes que ha generado.")
+                
                 # Fetches ALL tickets and filters in Python (Safe Fallback)
-                # This avoids crashing if DB columns for filtering are missing
                 my_email = st.session_state.get('email')
                 if my_email:
                      all_tickets = fetch_tickets(limit=100)
-                     # Filter manually: check description or user_email if it existed
+                     # Robust filter for my tickets
                      sent_tickets = [t for t in all_tickets if list(filter(None, [t.get('user_email') == my_email, my_email in t.get('description', '')]))]
                      
                      if sent_tickets:
-                         for t in sent_tickets[:5]: # Show last 5
+                         for t in sent_tickets[:10]: # Limit to last 10 for performance
                              # Handle 'subject' or 'title'
+                             t_id = t.get('id')
                              subj = t.get('subject', t.get('title', 'Sin título'))
+                             status = t.get('status', 'Pendiente')
+                             
                              with st.expander(f"{t.get('created_at', '')[:10]} - {subj}"):
-                                 st.caption(f"Estado: {t.get('status')} | Destino: {t.get('depto')}") # fast fix, prefer name
+                                 st.caption(f"ID: {str(t_id)[-6:]} | Estado: {status} | Destino: {t.get('depto')}")
                                  st.write(t.get('description'))
+                                 
+                                 st.divider()
+                                 
+                                 # CRUD Controls
+                                 # Allow editing/deleting mainly if 'Pendiente', but user asked for CRUD. 
+                                 # We'll allow it generally but maybe warn/restrict if finalized.
+                                 
+                                 cr_cols = st.columns([1, 1])
+                                 
+                                 # DELETE BUTTON
+                                 with cr_cols[1]:
+                                     if st.button("🗑️ Eliminar", key=f"btn_del_{t_id}", help="Eliminar permanentemente esta solicitud"):
+                                         try:
+                                             delete_ticket(t_id)
+                                             st.success("Solicitud eliminada.")
+                                             time.sleep(1)
+                                             st.rerun()
+                                         except Exception as e:
+                                             st.error(f"Error al eliminar: {e}")
+                                 
+                                 # EDIT FORM (Toggle or Inline)
+                                 # We'll use a checkbox to reveal the edit form to keep UI clean
+                                 if st.checkbox("✏️ Editar Solicitud", key=f"chk_edit_{t_id}"):
+                                     with st.form(key=f"form_edit_{t_id}"):
+                                         new_subj = st.text_input("Asunto", value=subj)
+                                         new_desc = st.text_area("Descripción", value=t.get('description', ''))
+                                         
+                                         if st.form_submit_button("💾 Guardar Cambios"):
+                                             updates = {
+                                                 'subject': new_subj,
+                                                 'description': new_desc
+                                             }
+                                             try:
+                                                 update_ticket(t_id, updates)
+                                                 st.success("Actualizado correctamente.")
+                                                 time.sleep(1)
+                                                 st.rerun()
+                                             except Exception as e:
+                                                 st.error(f"Error al actualizar: {e}")
+                                                 
                      else:
                          st.info("No ha enviado solicitudes aún.")
 
