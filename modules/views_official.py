@@ -4,13 +4,13 @@ from modules.db import fetch_tickets, fetch_ticket_by_id, delete_ticket, update_
 from modules.tickets import render_ticket_list
 from modules.ticket_detail import render_ticket_detail
 from modules.ui import render_field_ops_card_grid
-from modules.auth import get_current_role # Import globally to ensure availability check
 
 
 
 def render_official_view(tickets_data, current_filter):
     # Determine Label for Title
     from modules.ui import UNIDADES
+    from modules.auth import get_current_role # Imported locally to avoid circular import
     label_unidad = UNIDADES.get(current_filter, {}).get('label', current_filter) if current_filter != 'Todos' else 'Vista Global'
     
     st.title(f"Gestión: {label_unidad}")
@@ -197,7 +197,7 @@ def render_official_view(tickets_data, current_filter):
                 my_email = st.session_state.get('email')
                 
                 # FIX: Use get_current_role to respect Simulation Mode
-                # get_current_role imported globally
+                # get_current_role already imported at function start
                 current_role = get_current_role()
                 
                 if my_email or current_role:
