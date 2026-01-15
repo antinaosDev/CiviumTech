@@ -168,7 +168,7 @@ def render_official_view(tickets_data, current_filter):
                                 'subject': subject, # Renamed from 'title' to match DB/Citizen
                                 'description': desc,
                                 'category': 'Interna', 
-                                'citizen_name': f"Interna - {st.session_state.get('user_role', 'Funcionario')}", # Identify Origin Role
+                                'citizen_name': f"Interna - {get_current_role()}", # Identify Origin Role (Active/Simulated)
                                 'urgency': priority.capitalize(), # Match Citizen Format 'Baja' vs 'BAJA'
                                 'status': 'Pendiente', # 'RECIBIDO' violated check constraint on live DB
                                 'depto': selected_dept['code'],
