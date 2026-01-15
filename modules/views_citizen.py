@@ -135,7 +135,17 @@ def render_citizen_view():
                         col1, col2 = st.columns(2)
                         
                         with col1:
-                            unit_options = {u['label']: k for k, u in UNIDADES.items()}
+                            # ALLOWED UNITS FOR CITIZENS
+                            ALLOWED_CITIZEN_UNITS = [
+                                'SECPLAN', 'SECPLAN_FOMENTO', 
+                                'DIDECO_DIR', 'SOCIAL_AYUDA', 'SOCIAL_ADULTO', 'SOCIAL_VIVIENDA', 'SOCIAL_AUTOCONSUMO', 'SOCIAL_VINCULOS', 'SOCIAL_PUENTE', 'SOCIAL_INFANCIA', 'SOCIAL_MUJER', 'SENDA', 'MEDIO_AMBIENTE',
+                                'DOM_DIR', 'DOM_TRANSITO',
+                                'DAF_DIR', 'DAF_RENTAS',
+                                'UDEL', 'PRODESAL', 'PDTI',
+                                'SALUD', 'EDUCACION', 'DEPORTES', 'CULTURA', 'SEGURIDAD'
+                            ]
+
+                            unit_options = {u['label']: k for k, u in UNIDADES.items() if k in ALLOWED_CITIZEN_UNITS}
                             sorted_labels = sorted(unit_options.keys())
                             selected_label = st.selectbox("Área / Departamento", options=sorted_labels, help="Seleccione el departamento responsable")
                         
