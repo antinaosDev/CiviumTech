@@ -161,8 +161,8 @@ def render_official_view(tickets_data, current_filter):
                                 'subject': subject, # Renamed from 'title' to match DB/Citizen
                                 'description': desc,
                                 'category': 'Interna', 
-                                'urgency': priority.upper(), # 'priority' col missing, using 'urgency'
-                                'status': 'RECIBIDO',
+                                'urgency': priority.capitalize(), # Match Citizen Format 'Baja' vs 'BAJA'
+                                'status': 'Pendiente', # 'RECIBIDO' violated check constraint on live DB
                                 'depto': selected_dept['code'],
                                 'user_email': st.session_state.get('email') # Restoring as it works in Citizen
                             }
