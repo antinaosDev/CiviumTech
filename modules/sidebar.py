@@ -65,10 +65,10 @@ def render_custom_sidebar(current_role):
             
             # --- MAPPING ROLES TO GROUPS ---
             # Direccion Superior
-            if current_role in ['ALCALDIA', 'CONCEJO', 'ADMIN_MUNICIPAL', 'JPL', 'COSOC', 'INFORMATICA', 'JURIDICO', 'CONTROL']:
+            if current_role in ['ALCALDIA', 'CONCEJO', 'ADMIN_MUNICIPAL', 'JPL', 'COSOC', 'JURIDICO', 'CONTROL']:
                 visible_groups = ['Dirección Superior']
             # Gestion Interna
-            elif current_role in ['SECRETARIA', 'OF_PARTES', 'SECPLAN', 'PRENSA', 'TRANSPARENCIA']:
+            elif current_role in ['SECRETARIA', 'OF_PARTES', 'SECPLAN', 'PRENSA', 'TRANSPARENCIA', 'INFORMATICA']:
                  visible_groups = ['Gestión Interna']
             # Desarrollo Social
             elif current_role in ['DIDECO', 'DIDECO_DIR', 'SENDA', 'MEDIO_AMBIENTE']:
@@ -101,7 +101,8 @@ def render_custom_sidebar(current_role):
                     role_map = {
                         'DIDECO': 'DIDECO_DIR',
                         'DOM': 'DOM_DIR',
-                        'DAF': 'DAF_DIR' 
+                        'DAF': 'DAF_DIR',
+                        'JUSTICIA': 'JPL' 
                     }
                     
                     # 2. Determine target unit code
