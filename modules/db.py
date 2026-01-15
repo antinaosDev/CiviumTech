@@ -105,6 +105,7 @@ def fetch_departments():
         try:
              res = client.table("departments").select("id, name, code").order("name").execute()
         except Exception:
+             # Fallback silently if 'code' column is missing
              res = client.table("departments").select("id, name").order("name").execute()
              
         return res.data if res.data else []

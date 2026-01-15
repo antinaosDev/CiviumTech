@@ -14,6 +14,7 @@ def render_official_view(tickets_data, current_filter):
     label_unidad = UNIDADES.get(current_filter, {}).get('label', current_filter) if current_filter != 'Todos' else 'Vista Global'
     
     st.title(f"Gestión: {label_unidad}")
+    # st.caption("v.FixLoad") # Debug marker hidden to avoid clutter but change file hash
     
     # Check if a ticket is selected for detail view
     selected_id = st.session_state.get('selected_ticket_id')
