@@ -28,7 +28,7 @@ def render_custom_sidebar(current_role):
                  if st.button("⏹️ Dejar de Simular"):
                      del st.session_state['simulated_role']
                      st.rerun()
-            else:
+            elif current_role != 'CITIZEN':
                 st.caption(f"Rol: {current_role}")
             
             st.divider()
@@ -37,6 +37,8 @@ def render_custom_sidebar(current_role):
         selected_view = 'overview' # Default
         
         if current_role == 'CITIZEN':
+            if st.button("⬅️ Volver al Inicio"):
+                logout_user()
             return 'citizen'
             
         # Global Nav
