@@ -268,6 +268,8 @@ def render_mayor_dashboard(tickets_data):
                 
                 st.plotly_chart(fig_trend, use_container_width=True)
                 st.caption("📅 **Interpretación:** Evolución temporal diferenciada entre demanda vecinal y gestión interna.")
+            except Exception as e:
+                st.error(f"Error Tendencias: {e}")
             
     with c_urgency:
         if 'urgency' in df.columns:
