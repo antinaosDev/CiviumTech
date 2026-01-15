@@ -109,7 +109,8 @@ def main():
                             st.session_state.selected_ticket_id = None
                             st.rerun()
                     else:
-                        render_ticket_list(tickets_data, current_filter, search_query=None)
+                        from modules.views_official import render_official_view
+                        render_official_view(tickets_data, current_filter)
             
             else:
                  st.info(f"Seleccione una opción del menú. (Vista: {current_view})")

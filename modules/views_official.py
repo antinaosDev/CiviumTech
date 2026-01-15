@@ -4,8 +4,12 @@ from modules.tickets import render_ticket_list
 from modules.ticket_detail import render_ticket_detail
 from modules.ui import render_field_ops_card_grid
 
-def render_official_view():
-    st.title("Bandeja de Entrada")
+def render_official_view(tickets_data, current_filter):
+    # Determine Label for Title
+    from modules.ui import UNIDADES
+    label_unidad = UNIDADES.get(current_filter, {}).get('label', current_filter) if current_filter != 'Todos' else 'Vista Global'
+    
+    st.title(f"Gestión: {label_unidad}")
     
     # Check if a ticket is selected for detail view
     selected_id = st.session_state.get('selected_ticket_id')
@@ -21,39 +25,83 @@ def render_official_view():
                 st.session_state.selected_ticket_id = None
                 st.rerun()
     else:
-        # Default: Show List
-        # Note: We rely on the caller (app.py) to have set filters if needed, 
-        # basically app.py seems to call `fetch_tickets` and pass data to `render_ticket_list`. 
-        # But `render_official_view` in original code fetched tickets itself implicitly (lines 433).
-        # We will keep this behavior but handle it robustly.
-        
-        st.info("Seleccione una unidad en el menú lateral para ver las solicitudes.")
-        
-        # Determine User Context
-        user_dept = st.session_state.get('department') # e.g., 'DOM', 'DIDECO'
-        # user_dept_id = ... (We might need the ID, but ticket filtering primarily relies on department codes or IDs depending on DB implementation)
-        # Looking at schema, 'assigned_department_id' is UUID.
-        # But 'fetch_tickets' filters logic relies on exact match.
-        # Let's verify if `department` in session is ID or Code. 
-        # In `auth.py`, `st.session_state['department'] = user_row.get('department', '')`.
-        # We need to know if that is ID string or Name. Assuming ID based on `users` table FK.
-        
         # Tabs for Inbox vs Outbox/Create
-        tab_inbox, tab_create = st.tabs(["📥 Bandeja de Entrada", "✍️ Generar Solicitud"])
+        tab_inbox, tab_create = st.tabs(["📥 Bandeja de Entrada", "✍️ Generar Solicitud / Interna"])
 
         with tab_inbox:
-            st.subheader(f"Solicitudes para mi Unidad")
-            # Filter tickets where assigned_department_id == user's department
-            # If user_dept is None/Empty, they see nothing or all? -> Nothing for safety.
-            if user_dept:
-                # We need to filter by 'assigned_department_id'
-                # Note: `fetch_tickets` filters argument is dynamic.
-                # Use 'assigned_department_id' if your DB uses UUIDs, or 'depto' if using codes. 
-                # Based on schema it is `assigned_department_id`.
-                inbox_tickets = fetch_tickets(filters={'assigned_department_id': user_dept}) 
-                render_ticket_list(inbox_tickets, 'Todos', None)
+            st.subheader(f"Solicitudes: {label_unidad}")
+            
+            # Use the passed tickets_data which is already filtered by app.py
+            if tickets_data:
+                # We reuse render_ticket_list to render the actual CARDS, but strictly for display
+                # Note: render_ticket_list has its own Header/Form logic we want to bypass if we are wrapping it.
+                # However, render_ticket_list is designed to be a standalone full view. 
+                # We should probably strip render_ticket_list of its header/form OR just call the rendering part.
+                # For now, let's call render_ticket_list but pass a flag or just let it render. 
+                # Wait, render_ticket_list renders a Header and a Form. We don't want that double header.
+                
+                # Let's extract the loop from render_ticket_list or copy it here? 
+                # Better: Use render_ticket_list but we might see the duplicate form if we don't be careful.
+                # The form in render_ticket_list appears if filter_category != 'Todos'.
+                
+                # OPTION: We modified render_ticket_list to NOT show the form? 
+                # Or we just implement the card loop here to be clean and custom.
+                # Let's use the card loop here for the "Official View" style using the code from render_ticket_list.
+                
+                # ... copying card rendering logic ...
+                # Import UNIDADES and badges is needed (already at top)
+                from modules.ui import render_status_badge, render_urgency_badge
+                
+                import pandas as pd
+                df = pd.DataFrame(tickets_data)
+                
+                # --- Search & Filter UI (Mini) ---
+                c_search, c_filt = st.columns([3, 1])
+                search = c_search.text_input("🔍 Buscar en lista...", label_visibility="collapsed", placeholder="Buscar...")
+                
+                if search:
+                    q = search.lower()
+                    df = df[
+                         df['title'].astype(str).str.lower().str.contains(q) |
+                         df['description'].str.lower().str.contains(q)
+                    ]
+
+                for _, row in df.iterrows():
+                     # ... Render Card ...
+                     # (Simplified version of tickets.py card)
+                     with st.container():
+                        t_id = row.get('id', '???')
+                        t_title = row.get('title', 'Sin Asunto')
+                        t_desc = row.get('description', '')
+                        t_status = row.get('status', 'RECIBIDO')
+                        t_prio = row.get('priority', 'MEDIA')
+                        t_depto_code = row.get('depto', '???')
+                        
+                        # Unit Info
+                        u_info = UNIDADES.get(t_depto_code, {})
+                        u_label = u_info.get('label', t_depto_code)
+                        
+                        st.markdown(f"""
+                        <div style="background:white; padding:1rem; border-radius:8px; border:1px solid #e2e8f0; margin-bottom:0.8rem; box-shadow:0 1px 2px rgba(0,0,0,0.05);">
+                           <div style="display:flex; justify-content:space-between; margin-bottom:0.5rem">
+                               <span style="font-weight:700; color:#475569">#{str(t_id)[-6:]}</span>
+                               <span style="font-size:0.8rem; background:#f1f5f9; padding:2px 6px; border-radius:4px">{u_label}</span>
+                           </div>
+                           <div style="font-weight:600; font-size:1.05rem; margin-bottom:0.2rem">{t_title}</div>
+                           <div style="color:#64748b; font-size:0.9rem; margin-bottom:0.8rem">{t_desc[:100]}...</div>
+                           <div style="display:flex; gap:0.5rem; align-items:center">
+                               {render_status_badge(t_status)}
+                               {render_urgency_badge(t_prio)}
+                           </div>
+                        </div>
+                        """, unsafe_allow_html=True)
+                        
+                        if st.button("Gestionar", key=f"btn_manage_{t_id}"):
+                            st.session_state.selected_ticket_id = t_id
+                            st.rerun()
+
             else:
-                st.warning("No tiene un departamento asignado. Contacte al administrador.")
+                st.info("No hay solicitudes en esta bandeja.")
 
         with tab_create:
             st.subheader("Generar Solicitud Interna")
