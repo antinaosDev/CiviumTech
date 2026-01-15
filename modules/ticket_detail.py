@@ -31,8 +31,13 @@ def render_ticket_detail(ticket):
             # Row 1
             r1c1, r1c2 = st.columns(2)
             with r1c1:
-                st.caption("CIUDADANO")
-                st.markdown(f"**{ticket.get('citizen_name', ticket.get('ciudadano'))}**")
+                # Dynamic Label: UNIDAD if internal, CIUDADANO otherwise
+                c_name = ticket.get('citizen_name', ticket.get('ciudadano', ''))
+                is_internal = ticket.get('category') == 'Interna' or 'Interna' in str(c_name)
+                lbl_origin = "UNIDAD SOLICITANTE" if is_internal else "CIUDADANO"
+                
+                st.caption(lbl_origin)
+                st.markdown(f"**{c_name}**")
             with r1c2:
                 st.caption("FECHA DE INGRESO")
                 # Format date if possible

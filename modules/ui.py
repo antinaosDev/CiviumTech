@@ -31,6 +31,7 @@ UNIDADES = {
   'CONCEJO': {'label': 'Concejo Municipal', 'group': 'Dirección Superior', 'color': 'bg-slate-700 text-white', 'icon': 'groups', 'hex_bg': '#334155', 'hex_text': '#ffffff'},
   'ADMIN_MUNICIPAL': {'label': 'Administración Municipal', 'group': 'Dirección Superior', 'color': 'bg-slate-800 text-slate-200', 'icon': 'business', 'hex_bg': '#1e293b', 'hex_text': '#e2e8f0'},
   'JPL': {'label': 'Juzgado Policía Local', 'group': 'Dirección Superior', 'color': 'bg-stone-200 text-stone-800', 'icon': 'balance', 'hex_bg': '#e7e5e4', 'hex_text': '#292524'},
+  'JUSTICIA': {'label': 'Juzgado Policía Local', 'group': 'Dirección Superior', 'color': 'bg-stone-200 text-stone-800', 'icon': 'balance', 'hex_bg': '#e7e5e4', 'hex_text': '#292524'}, # Alias for consistency
   'COSOC': {'label': 'COSOC', 'group': 'Dirección Superior', 'color': 'bg-stone-100 text-stone-600', 'icon': 'diversity_3', 'hex_bg': '#f5f5f4', 'hex_text': '#57534e'},
   'INFORMATICA': {'label': 'Informática', 'group': 'Dirección Superior', 'color': 'bg-cyan-900 text-cyan-100', 'icon': 'computer', 'hex_bg': '#164e63', 'hex_text': '#cffafe'},
   'JURIDICO': {'label': 'Asesoría Jurídica', 'group': 'Dirección Superior', 'color': 'bg-stone-300 text-stone-900', 'icon': 'gavel', 'hex_bg': '#d6d3d1', 'hex_text': '#1c1917'},

@@ -134,9 +134,13 @@ def render_official_view(tickets_data, current_filter):
                         d_code = d.get('code') # Might be None/Missing if DB schema differs
                         
                         # If code is missing, try to infer from UNIDADES or Name
+                        # If code is missing, try to infer from UNIDADES or Name
                         if not d_code:
+                            # Explicit Override for Justicia -> JPL
+                            if d_name == 'Justicia':
+                                d_code = 'JPL'
                             # Try to match Name to UNIDADES Label
-                            if d_name in label_to_code:
+                            elif d_name in label_to_code:
                                 d_code = label_to_code[d_name]
                             else:
                                 # Fallback: Generate a code from name (e.g. "DIDECO" from "DIDECO (Desc...)")
