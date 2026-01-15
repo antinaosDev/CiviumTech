@@ -196,26 +196,22 @@ def render_official_view(tickets_data, current_filter):
                      all_tickets = fetch_tickets(limit=100)
                      
                      # Robust filter for my tickets:
-                     # 1. Match by Email (Legacy/User specific)
-                     # 2. Match by Role Signature in citizen_name (Role specific)
-                     # User requested STRICT role filtering ("solo las generadas por el rol activo")
+                     # STRICT MODE: Only match tickets clearly signed by the current role.
+                     # We disable email fallback to prevent "polluting" the view with tickets
+                     # from other roles created with the same testing email.
                      
                      sent_tickets = []
                      target_signature = f"Interna - {current_role}"
                      
                      for t in all_tickets:
                          c_name = t.get('citizen_name', '')
-                         u_email = t.get('user_email', '')
-                         desc = t.get('description', '')
                          
-                         # Check strict role match first
+                         # Check strict role match
                          if current_role and target_signature in c_name:
                              sent_tickets.append(t)
-                         # Fallback to email ONLY if it's not clearly tagged with another role
-                         elif my_email and (u_email == my_email or my_email in desc):
-                             # Only include if it DOESN'T belong to another internal role
-                             if "Interna -" not in c_name:
-                                sent_tickets.append(t)
+                         
+                         # Note: Legacy tickets (without signature) are excluded prevents ambiguity.
+                         # Users must create new tickets to see them here reliably.
                      
                      if sent_tickets:
                          for t in sent_tickets[:10]: # Limit to last 10 for performance
