@@ -158,18 +158,18 @@ def render_official_view(tickets_data, current_filter):
                             # Create Ticket Payload
                             selected_dept = dept_map[target_dept_name]
                             new_ticket = {
-                                'title': subject,
+                                'subject': subject, # Renamed from 'title' to match DB/Citizen
                                 'description': desc,
                                 'category': 'Interna', 
-                                'priority': priority.upper(),
+                                'urgency': priority.upper(), # 'priority' col missing, using 'urgency'
                                 'status': 'RECIBIDO',
-                                'depto': selected_dept['code'] 
-                                # OMITTING: user_id, assigned_department_id, user_email due to Schema Mismatch on Live DB
+                                'depto': selected_dept['code'],
+                                'user_email': st.session_state.get('email') # Restoring as it works in Citizen
                             }
                             
                             # Add Email to description as metadata workaround
-                            if st.session_state.get('email'):
-                                new_ticket['description'] += f"\n\n[Enviado por: {st.session_state.get('email')}]"
+                            # if st.session_state.get('email'):
+                            #    new_ticket['description'] += f"\n\n[Enviado por: {st.session_state.get('email')}]"
 
                             from modules.db import create_ticket
                             try:
@@ -187,16 +187,15 @@ def render_official_view(tickets_data, current_filter):
                 my_email = st.session_state.get('email')
                 if my_email:
                      all_tickets = fetch_tickets(limit=100)
-                     # Filter manually: check description or user_email if it existed (but we just removed it from payload? No, we likely want it if it exists)
-                     # Since we added it to description, we can search description? Or hope user_email exists?
-                     # Better: search description for "[Enviado por: {my_email}]"
-                     
-                     sent_tickets = [t for t in all_tickets if my_email in t.get('description', '') or t.get('user_email') == my_email]
+                     # Filter manually: check description or user_email if it existed
+                     sent_tickets = [t for t in all_tickets if list(filter(None, [t.get('user_email') == my_email, my_email in t.get('description', '')]))]
                      
                      if sent_tickets:
                          for t in sent_tickets[:5]: # Show last 5
-                             with st.expander(f"{t.get('created_at', '')[:10]} - {t.get('title', 'Sin título')}"):
-                                 st.caption(f"Estado: {t.get('status')} | Destino: {t.get('assigned_department_id')}") # fast fix, prefer name
+                             # Handle 'subject' or 'title'
+                             subj = t.get('subject', t.get('title', 'Sin título'))
+                             with st.expander(f"{t.get('created_at', '')[:10]} - {subj}"):
+                                 st.caption(f"Estado: {t.get('status')} | Destino: {t.get('depto')}") # fast fix, prefer name
                                  st.write(t.get('description'))
                      else:
                          st.info("No ha enviado solicitudes aún.")
