@@ -73,13 +73,20 @@ def render_mayor_dashboard(tickets_data):
     elif 'fecha' in df.columns: # Legacy fallback
          df['date_str'] = pd.to_datetime(df['fecha']).dt.date
          
-    # Ensure category column
+    # Ensure category column and Create Source Type
     if 'category' not in df.columns and 'categoria' in df.columns:
         df['category'] = df['categoria'] # Legacy fallback
+
+    # Distinct Logic
+    df['source_type'] = df['category'].apply(lambda x: 'Interna' if x == 'Interna' else 'Ciudadana')
 
     # 3. Kpi Cards
     c1, c2, c3, c4 = st.columns(4)
     with c1:
+        # Calculate Breakdown
+        count_internal = df[df['source_type'] == 'Interna'].shape[0]
+        count_citizen = df[df['source_type'] == 'Ciudadana'].shape[0]
+        
         # Calculate Growth vs Last Month
         current_month = getattr(pd.Timestamp.now(), 'month')
         if 'created_at' in df.columns:
@@ -99,7 +106,10 @@ def render_mayor_dashboard(tickets_data):
                 <span style="font-size: 1.5rem;">📄</span>
             </div>
             <div style="font-size: 1.875rem; font-weight: 900; color: #1e293b;">{total}</div>
-            <div style="font-size: 0.75rem; color: {growth_color}; font-weight: 700; margin-top: 0.25rem;">{growth_str}</div>
+            <div style="font-size: 0.75rem; color: #64748b; margin-top: 0.25rem;">
+                <span style="color: #2563eb; font-weight: 600;">{count_citizen}</span> Ciudadanas | 
+                <span style="color: #ea580c; font-weight: 600;">{count_internal}</span> Internas
+            </div>
         </div>
         """, unsafe_allow_html=True)
     
@@ -155,24 +165,35 @@ def render_mayor_dashboard(tickets_data):
         with st.container():
             st.markdown("### 📊 Carga de Trabajo por Unidad")
             if 'depto' in df.columns:
-                # Top 5
-                top_5 = df['depto'].value_counts().head(5)
-                # Create visual bars
-                for code, count in top_5.items():
-                    unit = UNIDADES.get(code, {'label': code, 'hex_bg': '#cbd5e1'})
-                    pct = (count / total) * 100
-                    
-                    st.markdown(f"""
-                    <div style="margin-bottom: 1.25rem;">
-                        <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 0.5rem;">
-                            <span style="font-size: 0.9rem; font-weight: 700; color: #1e293b;">{unit['label']}</span>
-                            <span style="font-size: 0.85rem; font-weight: 600; color: #64748b;">{count} tickets <span style="color: #94a3b8; font-weight: 400;">({int(pct)}%)</span></span>
-                        </div>
-                        <div style="height: 0.75rem; background-color: #f1f5f9; border-radius: 9999px; overflow: hidden; box-shadow: inset 0 1px 2px rgba(0,0,0,0.05);">
-                            <div style="height: 100%; width: {pct}%; background-color: {unit.get('hex_bg').replace('bg-', '')}; border-radius: 9999px; transition: width 1s ease-in-out;"></div>
-                        </div>
-                    </div>
-                    """, unsafe_allow_html=True)
+                # Top 5 Depts by Volume
+                top_5_codes = df['depto'].value_counts().head(5).index.tolist()
+                
+                # Filter DF to only top 5 for cleaner chart
+                df_top = df[df['depto'].isin(top_5_codes)]
+                
+                # Group by Dept and Source
+                grouped = df_top.groupby(['depto', 'source_type']).size().reset_index(name='count')
+                
+                # Add labels
+                grouped['unit_label'] = grouped['depto'].apply(lambda x: UNIDADES.get(x, {}).get('label', x))
+                
+                fig_bar = px.bar(
+                    grouped, 
+                    x='unit_label', 
+                    y='count', 
+                    color='source_type',
+                    title=None,
+                    barmode='stack',
+                    color_discrete_map={'Ciudadana': '#2563eb', 'Interna': '#f97316'},
+                    labels={'unit_label': 'Unidad', 'count': 'Tickets', 'source_type': 'Origen'}
+                )
+                fig_bar.update_layout(
+                    template="plotly_white", 
+                    legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
+                    margin=dict(t=30, b=0, l=0, r=0)
+                )
+                st.plotly_chart(fig_bar, use_container_width=True)
+                
             else:
                 st.info("Sin datos de departamentos.")
  
@@ -230,22 +251,23 @@ def render_mayor_dashboard(tickets_data):
     with c_trend:
         if 'date_str' in df.columns:
             try:
-                daily_counts = df.groupby('date_str').size().reset_index(name='count')
+                # Stacked Area Chart by Source Type
+                daily_counts = df.groupby(['date_str', 'source_type']).size().reset_index(name='count')
+                
                 fig_trend = px.area(
-                    daily_counts, x='date_str', y='count',
-                    title="Evolución de Solicitudes",
-                    labels={'date_str': 'Fecha', 'count': 'Tickets'},
+                    daily_counts, x='date_str', y='count', color='source_type',
+                    title="Evolución de Solicitudes (Por Origen)",
+                    labels={'date_str': 'Fecha', 'count': 'Tickets', 'source_type': 'Origen'},
+                    color_discrete_map={'Ciudadana': '#2563eb', 'Interna': '#f97316'},
                     template="plotly_white"
                 )
-                fig_trend.update_traces(line_color='#2563eb', fillcolor='rgba(37, 99, 235, 0.2)', hovertemplate="<b>Fecha</b>: %{x|%d-%m-%Y}<br><b>Tickets</b>: %{y}<extra></extra>")
+                fig_trend.update_traces(hovertemplate="<b>Fecha</b>: %{x|%d-%m-%Y}<br><b>Tickets</b>: %{y}<br><b>Tipo</b>: %{fullData.name}<extra></extra>")
                 # Force numeric dates on X axis (Spanish format)
                 fig_trend.update_xaxes(tickformat="%d/%m/%Y")
+                fig_trend.update_layout(legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1))
+                
                 st.plotly_chart(fig_trend, use_container_width=True)
-                st.caption("📅 **Interpretación:** Muestra el volumen diario de solicitudes. Los picos indican días de alta demanda ciudadana.")
-            except Exception as e:
-                st.error(f"Error Tendencias: {e}")
-        else:
-            st.info("Sin datos de fechas.")
+                st.caption("📅 **Interpretación:** Evolución temporal diferenciada entre demanda vecinal y gestión interna.")
             
     with c_urgency:
         if 'urgency' in df.columns:
