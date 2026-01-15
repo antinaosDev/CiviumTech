@@ -204,7 +204,7 @@ def render_official_view(tickets_data, current_filter):
                      target_signature = f"Interna - {current_role}"
                      
                      for t in all_tickets:
-                         c_name = t.get('citizen_name', '')
+                         c_name = t.get('citizen_name') or ''
                          
                          # Check strict role match
                          if current_role and target_signature in c_name:
