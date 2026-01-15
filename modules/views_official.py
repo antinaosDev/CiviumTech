@@ -115,9 +115,34 @@ def render_official_view(tickets_data, current_filter):
                     
                     # Fetch Depts for Dropdown
                     from modules.db import fetch_departments
+                    from modules.ui import UNIDADES
+                    
                     depts = fetch_departments() 
-                    # Convert to format for selectbox: Name -> {id, code}
-                    dept_map = {d['name']: {'id': d['id'], 'code': d['code']} for d in depts}
+                    
+                    # Robust Mapping: Name -> {id, code}
+                    dept_map = {}
+                    
+                    # Helper for reverse lookup (Label -> Code)
+                    label_to_code = {v['label']: k for k, v in UNIDADES.items()}
+                    
+                    for d in depts:
+                        d_id = d['id']
+                        d_name = d['name']
+                        d_code = d.get('code') # Might be None/Missing if DB schema differs
+                        
+                        # If code is missing, try to infer from UNIDADES or Name
+                        if not d_code:
+                            # Try to match Name to UNIDADES Label
+                            if d_name in label_to_code:
+                                d_code = label_to_code[d_name]
+                            else:
+                                # Fallback: Generate a code from name (e.g. "DIDECO" from "DIDECO (Desc...)")
+                                # This is risky but necessary if column is missing.
+                                # Simple: Take first word upper
+                                d_code = d_name.split(' ')[0].upper()[:10]
+                        
+                        dept_map[d_name] = {'id': d_id, 'code': d_code}
+                    
                     
                     target_dept_name = st.selectbox("Unidad de Destino", options=list(dept_map.keys()))
                     
@@ -138,7 +163,8 @@ def render_official_view(tickets_data, current_filter):
                                 'category': 'Interna', 
                                 'priority': priority.upper(),
                                 'status': 'RECIBIDO',
-                                'user_id': st.session_state.get('user_id'),
+                                # 'user_id': st.session_state.get('user_id'), # REMOVED: Column missing in live DB
+                                'user_email': st.session_state.get('email'), # Creator Email (For filtering)
                                 'assigned_department_id': selected_dept['id'],
                                 'depto': selected_dept['code'] # REQUIRED for compatibility with UI
                             }
@@ -154,13 +180,12 @@ def render_official_view(tickets_data, current_filter):
 
             with c2:
                 st.write("###### Mis Solicitudes Enviadas")
-                # Fetch tickets created by me (user_id)
-                my_id = st.session_state.get('user_id')
-                if my_id:
-                     # We need to filter by creator. 
-                     # fetch_tickets filters are for equality. 
-                     # Schema: user_id is the creator.
-                     sent_tickets = fetch_tickets(filters={'user_id': my_id})
+                # Fetch tickets created by me
+                # FIX: Use 'user_email' instead of 'user_id' as 'user_id' column might be missing/unreliable in filters
+                # API Error showed 'column tickets.user_id does not exist' -> So we rely on user_email
+                my_email = st.session_state.get('email')
+                if my_email:
+                     sent_tickets = fetch_tickets(filters={'user_email': my_email})
                      if sent_tickets:
                          for t in sent_tickets[:5]: # Show last 5
                              with st.expander(f"{t.get('created_at', '')[:10]} - {t.get('title', 'Sin título')}"):

@@ -100,7 +100,13 @@ def fetch_departments():
     """Fetch all departments for selection."""
     client = get_supabase()
     try:
-        res = client.table("departments").select("id, name, code").order("name").execute()
+        # DB Schema Check: 'code' column might be missing in some envs.
+        # We try to fetch it, if it fails, we fetch without it.
+        try:
+             res = client.table("departments").select("id, name, code").order("name").execute()
+        except Exception:
+             res = client.table("departments").select("id, name").order("name").execute()
+             
         return res.data if res.data else []
     except Exception as e:
         print(f"Error fetching departments: {e}")
